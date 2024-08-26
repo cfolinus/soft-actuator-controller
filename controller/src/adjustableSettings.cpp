@@ -12,6 +12,17 @@ const int SENSOR_PIN = A7;
 const int PRESSURE_PIN = 6;
 const int VENT_PIN = 5;
 
+// ========== LCD Pin Definitions ==========
+/* These settings define the pins used to send data to the I2C LCD display.
+   Adjust the values to your specific hardware set-up.*/
+
+const int LCD_RS = 10;   // Register Select
+const int LCD_E = 9;    // Enable
+const int LCD_D4 = 8;    // Data Pin 4
+const int LCD_D5 = 7;    // Data Pin 5
+const int LCD_D6 = 3;    // Data Pin 6
+const int LCD_D7 = 2;    // Data Pin 7
+
 // ========== Pneumatic Valve Settings ==========
 /* These settings control the pressure applied by the pneumatic valves.
    Adjust the min and max analog write values to calibrate the pressure range. */

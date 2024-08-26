@@ -2,8 +2,8 @@
 #include "lcdDisplay.h"
 #include "adjustableSettings.h"
 
-// Define LCD pins
-LiquidCrystal lcd(10, 9, 8, 7, 3, 2);
+// Initialize the LiquidCrystal object with externally defined pin names
+LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 void setLCD(String text1, String value) {
   lcd.clear();

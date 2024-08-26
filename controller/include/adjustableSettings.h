@@ -8,6 +8,13 @@ extern const int SENSOR_PIN;
 extern const int PRESSURE_PIN;
 extern const int VENT_PIN;
 
+extern const int LCD_RS;   // Register Select
+extern const int LCD_E;    // Enable
+extern const int LCD_D4;    // Data Pin 4
+extern const int LCD_D5;    // Data Pin 5
+extern const int LCD_D6;    // Data Pin 6
+extern const int LCD_D7;    // Data Pin 7
+
 // Tuning variables
 extern const bool TUNE_PRESSURE;
 extern const bool TUNE_VENT;
