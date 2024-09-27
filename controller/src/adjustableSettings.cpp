@@ -6,7 +6,7 @@
    Adjust to your specific hardware set-up. Ensure PRESSURE_PIN and VENT_PIN are connected
    to PWM-capable pinouts on your microcontroller*/
 
-const int START_BUTTON_PIN = A5; 
+const int START_BUTTON_PIN = A3; 
 const int STOP_BUTTON_PIN = A4;
 const int SENSOR_PIN = A7;
 const int PRESSURE_PIN = 6;
@@ -46,9 +46,10 @@ const bool TUNE_VENT = false;
    Adjust the filter alpha value and maximum pressure according to your sensor's specifications.
    Toggle where you want to use kPa (true) or PSI (false) depending on your application/preference */
 
-const bool USE_KPA = true; 
+const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 250;
+const int OVERPRESSURE_LIMIT = 35;
+const double SENSOR_OFFSET = 0.08; // Offset to calibrate sensor
 
 // ========== Frequency Settings ==========
 /* These settings determine the frequency at which various tasks are performed.
@@ -87,7 +88,7 @@ const double KD = 0.0;
 
 // Step Function Trajectory
 const float TIMES[] = {0, 100, 2000, 2100, 3000}; // milliseconds
-const double PRESSURES[] = {0, 100, 100, 0, 0};    // PSI or Kpa
+const double PRESSURES[] = {0, 15, 15, 0, 0};    // PSI or Kpa
 
 // Uncomment to use a different trajectory:
 
@@ -95,13 +96,13 @@ const double PRESSURES[] = {0, 100, 100, 0, 0};    // PSI or Kpa
 // const float TIMES[] = {0, 1500, 3000}; // milliseconds
 // const double PRESSURES[] = {0, 20, 0}; // PSI or Kpa
 
-// Sawtooth Trajectory
+//Sawtooth Trajectory
 // const float TIMES[] = {0, 3000, 3100, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 20, 0, 0};    // PSI or Kpa
+// const double PRESSURES[] = {0, 15, 0, 0};    // PSI or Kpa
 
 // Reverse Sawtooth Trajectory
 // const float TIMES[] = {0, 100, 3100, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 20, 0, 0};   // PSI or Kpa
+// const double PRESSURES[] = {0, 15, 0, 0};   // PSI or Kpa
 
 // Sinusoidal Trajectory
 // const float TIMES[] = {0, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 10000}; // milliseconds

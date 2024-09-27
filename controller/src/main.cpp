@@ -32,6 +32,7 @@ void endTest(String reason, int cycles){
   closePressureValve();
   vent();
   valvePID.stop();
+  closeSD();
   setLCD(reason, "Cycles: " + String(totalCycles));
   exit(0);
 }
@@ -87,7 +88,7 @@ void setup() {
 
     // Set PID Controller settings
     valvePID.setTimeStep(CONTROLLER_DELAY); //milliseconds.
-    // Tells AutoPID to not use bang-bang control
+    // Tells AutoPID to NOT use bang-bang control
     valvePID.setBangBang(0, 0);
 
     // hold until start button pressed.
@@ -109,66 +110,68 @@ void loop() {
   if (digitalRead(STOP_BUTTON_PIN) == LOW){
     endTest(F("Stop Pressed"), totalCycles);
   }
+
   // Pressure valve tuning
-  if(TUNE_PRESSURE){ 
+  if (TUNE_PRESSURE) { 
     tuneValve(PRESSURE_PIN);
     setLCD(F("Pressure Valve"), F("Tuning Complete"));
     exit(0);
   }
   // Vent valve tuning
-  else if(TUNE_VENT){ 
+  else if (TUNE_VENT) { 
     tuneValve(VENT_PIN);
     setLCD(F("Pressure Valve"), F("Tuning Complete"));
     exit(0);
   }
-  // Otherwise, operate normally
-  else{ 
+  // Normal operation
+  else { 
     // Check that pressure does not exceed maximum
-    if (SensorPressure > OVERPRESSURE_LIMIT){
+    if (SensorPressure > OVERPRESSURE_LIMIT) {
       vent();
       endTest(F("Overpressure"), totalCycles);
     }
     // Check that controller isn't failing to follow the trajectory
-    if(traj.failingToFollow(SensorPressure, deltaT, THRESHOLD)){
+    if (traj.failingToFollow(SensorPressure, deltaT, THRESHOLD)) {
       endTest(F("Traj Follow Fail"), totalCycles);
     }
     // Check if cycle is complete
-    if (cycleComplete){
+    if (cycleComplete) {
       totalCycles++;
       setLCD(String(fileName), "Cycles: " + String(totalCycles));
-      valvePID.reset(); // anti-windup call
+      valvePID.reset();  // anti-windup call
       traj.reset();
       logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete);
       trajStartTime = millis();
+      syncData();
       cycleComplete = false;
     }
-    // Log data at 1/PRESSURE_READ_DELAY Hz
-    if ((millis() - lastPressureUpdate) > PRESSURE_READ_DELAY){
+    // Log data at (1/PRESSURE_READ_DELAY) Hz
+    if ((millis() - lastPressureUpdate) > PRESSURE_READ_DELAY) {
       UpdateFilteredSensorPressure(USE_KPA);
       logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete);
-      // reset pressure update timer
-      lastPressureUpdate = millis();
+      lastPressureUpdate = millis();  // Reset pressure update timer
     }
-    // interpolate setpoint at 1/INTERP_CALC_DELAY Hz
-    if ((millis() - lastInterpUpdate) > INTERP_CALC_DELAY){
-      // calculate time since start of trajectory cycle
+    // Interpolate setpoint at (1/INTERP_CALC_DELAY) Hz
+    if ((millis() - lastInterpUpdate) > INTERP_CALC_DELAY) {
+      // Calculate time since start of trajectory cycle
       deltaT = millis() - trajStartTime;
-      // check if trajectory is finished
-      if (traj.isFinished(deltaT)){
+      // Check if trajectory is finished
+      if (traj.isFinished(deltaT)) {
         desiredPressure = PRESSURES[TRAJ_SIZE - 1];
         cycleComplete = true;
-      }
-      else{ // if not, interpolate current setpoint
+      } else {
+        // If not, interpolate current setpoint
         desiredPressure = traj.interp(deltaT);
       }
-      // reset interpolation timer
+      // Reset interpolation timer
       lastInterpUpdate = millis();
     }
-    // control action
+    // Run the PID control action
     valvePID.run();
     sendSignalToValves(output);
   }
 }
+
 
 
 

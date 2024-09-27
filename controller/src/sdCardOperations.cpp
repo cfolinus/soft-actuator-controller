@@ -29,7 +29,7 @@ bool initializeSDCard() {
   // Initialize the SD card at SPI_HALF_SPEED to avoid bus errors with
   // breadboards. Use SPI_FULL_SPEED for better performance.
   // THIS COULD BE PART OF THE ISSUE?
-  if (!SD.begin(SD_CS_PIN, SD_SCK_MHZ(50))) {
+  if (!SD.begin(SD_CS_PIN, SD_SCK_MHZ(8))) {
     setLCD(F("SD Init"), F("Failed"));
     return false;
   }
@@ -109,12 +109,9 @@ void logData(double pressure, double error, double integral, bool cycleComplete)
   dataFile.print(',');
   dataFile.print(integral, 2);
   dataFile.print(',');
-  if (cycleComplete) {
-    dataFile.println("1");
-  }
-  else{
-    dataFile.println("0");
-  }
-  dataFile.sync(); // Ensure data is written to the file
+  dataFile.println(cycleComplete ? "1" : "0");
 }
 
+void syncData() {
+  dataFile.sync();
+}

@@ -29,6 +29,7 @@ extern const int ANALOG_VENT_MAX;
 extern const bool USE_KPA;
 extern const double FILTER_ALPHA;
 extern const int OVERPRESSURE_LIMIT;
+extern const double SENSOR_OFFSET;
 
 // Frequency variables
 extern const double PRESSURE_READ_DELAY;

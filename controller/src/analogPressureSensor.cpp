@@ -11,7 +11,7 @@ void getSensorPressure(bool USE_KPA) {
   // Conversion equation between pressure sensor's output range in analog values
   // to volts (min 0.5V, max 4.5V, range of 4.0V), and then from volts to PSI.
   // P = ((5V * SensorReading) / (MaxAnalogSignalValue) - 0.5V) * 150PSI/4V
-  SensorPressure = (5.0 * SensorReading / 1023.0 - 0.5) * 37.5; // Analog to PSI
+  SensorPressure = (5.0 * SensorReading / 1023.0 - 0.5) * 37.5 + SENSOR_OFFSET; // Analog to PSI
   if (USE_KPA) { // Convert to KPA if needed
     SensorPressure *= 6.89476; // PSI to KPA
   }
