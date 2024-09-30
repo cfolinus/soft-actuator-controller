@@ -106,6 +106,8 @@ void setup() {
 }
 
 void loop() {
+  // Get current time
+  unsigned long currentMillis = millis();
   // Stop operations if stop button is pressed
   if (digitalRead(STOP_BUTTON_PIN) == LOW){
     endTest(F("Stop Pressed"), totalCycles);
@@ -140,21 +142,21 @@ void loop() {
       setLCD(String(fileName), "Cycles: " + String(totalCycles));
       valvePID.reset();  // anti-windup call
       traj.reset();
-      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete);
+      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete, currentMillis);
       trajStartTime = millis();
       syncData();
       cycleComplete = false;
     }
     // Log data at (1/PRESSURE_READ_DELAY) Hz
-    if ((millis() - lastPressureUpdate) > PRESSURE_READ_DELAY) {
+    if ((currentMillis - lastPressureUpdate) > PRESSURE_READ_DELAY) {
       UpdateFilteredSensorPressure(USE_KPA);
-      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete);
-      lastPressureUpdate = millis();  // Reset pressure update timer
+      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete, currentMillis);
+      lastPressureUpdate = currentMillis;  // Reset pressure update timer
     }
     // Interpolate setpoint at (1/INTERP_CALC_DELAY) Hz
-    if ((millis() - lastInterpUpdate) > INTERP_CALC_DELAY) {
+    if ((currentMillis - lastInterpUpdate) > INTERP_CALC_DELAY) {
       // Calculate time since start of trajectory cycle
-      deltaT = millis() - trajStartTime;
+      deltaT = currentMillis - trajStartTime; // COULD FUCK UP THE ENTIRE PROGRAM
       // Check if trajectory is finished
       if (traj.isFinished(deltaT)) {
         desiredPressure = PRESSURES[TRAJ_SIZE - 1];
@@ -164,7 +166,7 @@ void loop() {
         desiredPressure = traj.interp(deltaT);
       }
       // Reset interpolation timer
-      lastInterpUpdate = millis();
+      lastInterpUpdate = currentMillis;
     }
     // Run the PID control action
     valvePID.run();

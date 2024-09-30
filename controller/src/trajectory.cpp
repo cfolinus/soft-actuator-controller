@@ -1,109 +1,91 @@
 #include "trajectory.h"
 #include "adjustableSettings.h"
-/*
-    * Trajectory class implementation
-    This class is used to store user-generated trajectory data and interpolate 
-    betweent the time and pressure values to create a smooth transition between
-    desired pressure setpoints.
-
-    times: array of time values
-    pressures: array of pressure values
-    maxSize: maximum size of the arrays as defined by the user in main.cpp
-    currentSetPoint: counter to keep track of the current setpoint in the trajectory
-    timeOut: time out value to prevent the system from hanging if the trajectory is not completed
-*/
 
 // Constructor to initialize the size of the arrays and the counter
 Trajectory::Trajectory(int size) : maxSize(size), currentSetPoint(0) {
-    times = new float[size];
-    pressures = new double[size];
-    timeoutDuration = 2000; // 2 seconds
+    timeoutDuration = 2000; // 2 seconds default
     lastWithinThresholdTime = millis();
 }
 
-// Destructor to free allocated memory
-Trajectory::~Trajectory() {
-    delete[] times;
-    delete[] pressures;
-}
-
 // Function to reset the currentSetPoint counting variable
-// once a cycle is completed
 void Trajectory::reset() {
     currentSetPoint = 1;
     lastWithinThresholdTime = millis();
 }
 
-// Function to fill trajectory class instance with new data
-// and to set timeOut value
+// Function to fill trajectory class instance with new data and precompute differences
 bool Trajectory::setTrajectoryPoints(const float* newTimes, const double* newPressures, int size) {
     if (size > maxSize) {
         return false;
     }
+
+    // Copy data into the class arrays and precompute differences
     for (int i = 0; i < size; ++i) {
         times[i] = newTimes[i];
         pressures[i] = newPressures[i];
+        if (i > 0) {
+            timeDifferences[i - 1] = times[i] - times[i - 1];  // Precompute time differences
+            pressureDifferences[i - 1] = pressures[i] - pressures[i - 1]; // Precompute pressure differences
+        }
     }
     updateTimeoutDuration();
     return true;
 }
 
-// Function to linearly interpolate between two points
-// in the trajectlory based on the current time
+// Function to linearly interpolate between two points in the trajectory based on deltaT
 float Trajectory::interp(unsigned long deltaT) {
     if (maxSize < 2) {
         // Not enough points to interpolate
         return pressures[0];
     }
 
-    // Find correct interval for interpolation
-    // cannot simply increment currentSetPoint by 1
-    // due to time variabilities in control actions
-    for (int i = currentSetPoint; i < maxSize; ++i) {
-        if (deltaT < times[i]) {
-            currentSetPoint = i;
-            break;
+    // Binary search to find the correct interval for interpolation
+    int low = currentSetPoint;
+    int high = maxSize - 1;
+    while (low < high) {
+        int mid = (low + high) / 2;
+        if (deltaT < times[mid]) {
+            high = mid;
+        } else {
+            low = mid + 1;
         }
     }
-    // Perform linear interpolation
+    currentSetPoint = high;
+
+    // Use precomputed differences for linear interpolation
     float t1 = times[currentSetPoint - 1];
-    float t2 = times[currentSetPoint];
-    double p1 = pressures[currentSetPoint - 1];
-    double p2 = pressures[currentSetPoint];
-    float factor = (deltaT - t1) / (t2 - t1);
-    return p1 + factor * (p2 - p1);  
+    float factor = (deltaT - t1) / timeDifferences[currentSetPoint - 1];
+    return pressures[currentSetPoint - 1] + factor * pressureDifferences[currentSetPoint - 1];
 }
 
-// Function to check if the system failing to follow the trajectory
+// Function to check if the system is failing to follow the trajectory
 bool Trajectory::failingToFollow(double currentPressure, float deltaT, double threshold) {
+    unsigned long currentTime = millis();  // Cache millis() for efficiency
+
     double expectedPressure = pressures[currentSetPoint];
-    // Check if current pressure is too far from the non-zero setpoint
     if (abs(expectedPressure - currentPressure) > threshold && expectedPressure != 0.0) {
-        // If it is, check if how long since the last time pressure was within threshold
-        if ((millis() - lastWithinThresholdTime) > timeoutDuration){
-            // if it has been too long, declare failure to follow trajectory
-            return true;
+        if ((currentTime - lastWithinThresholdTime) > timeoutDuration) {
+            return true;  // Declare failure to follow trajectory
         }
-    } else { // if pressure is within threshold, update lastWithinThresholdTime
-        lastWithinThresholdTime = millis();
+    } else {
+        lastWithinThresholdTime = currentTime;  // Update within-threshold time
     }
-    // if both failure criterion aren't met, return false
-    return false;
+
+    return false;  // Not failing
 }
 
-// Function to print the trajectory data
-// for debugging purposes
+// Function to check if the trajectory is finished
 bool Trajectory::isFinished(unsigned long deltaT) const {
     return deltaT > times[maxSize - 1];
 }
 
-// Function to update the timeout duration if greater than the default
+// Function to update the timeout duration based on the longest interval between points
 void Trajectory::updateTimeoutDuration() {
-    timeoutDuration = 2000; // Default timeout duration
+    timeoutDuration = 2000;  // Default timeout
     for (int i = 1; i < maxSize; ++i) {
-        float interval = times[i] - times[i - 1];
+        float interval = timeDifferences[i - 1];  // Use precomputed time differences
         if (interval > timeoutDuration) {
-            timeoutDuration = interval + 500;
+            timeoutDuration = interval + 500;  // Add extra time as a buffer
         }
     }
 }
@@ -111,8 +93,5 @@ void Trajectory::updateTimeoutDuration() {
 // Initialize the trajectory object
 bool InitializeTrajectory(Trajectory* traj, const float* times, const double* pressures, int size) {
     // Ensure the size of the arrays is less than the maxSize of the trajectory object
-    if (!traj->setTrajectoryPoints(times, pressures, size)) {
-        return false;
-    }
-    return true;
+    return traj->setTrajectoryPoints(times, pressures, size);
 }

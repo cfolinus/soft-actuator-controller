@@ -55,9 +55,9 @@ const double SENSOR_OFFSET = 0.08; // Offset to calibrate sensor
 /* These settings determine the frequency at which various tasks are performed.
    You can adjust the delay values to control the frequency in milliseconds. */
 
-const double PRESSURE_READ_DELAY = 10; // milliseconds (100Hz)
-const int INTERP_CALC_DELAY = 50;      // milliseconds (20Hz)
-const int CONTROLLER_DELAY = 50;       // milliseconds (20Hz)
+const double PRESSURE_READ_DELAY = 5; // milliseconds (100Hz)
+const int INTERP_CALC_DELAY = 30;      // milliseconds (20Hz)
+const int CONTROLLER_DELAY = 30;       // milliseconds (20Hz)
 
 // ========== PID Controller Settings ==========
 /* These settings configure the PID controller that regulates pressure.

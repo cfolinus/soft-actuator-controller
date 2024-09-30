@@ -100,8 +100,8 @@ int getNextFileIndex() {
 }
 
 // write time, pressure, and error data to the SD card
-void logData(double pressure, double error, double integral, bool cycleComplete) {
-  dataFile.print(millis() - testStartTime);
+void logData(double pressure, double error, double integral, bool cycleComplete, unsigned long currentTime) {
+  dataFile.print(currentTime - testStartTime);
   dataFile.print(',');
   dataFile.print(pressure, 2);
   dataFile.print(',');
