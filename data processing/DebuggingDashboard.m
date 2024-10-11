@@ -3,7 +3,7 @@ clear; close all;
 addpath(genpath('helper functions'));
 
 % Define PID controller gains assocaited with to-be-examined test file
-Kp = 0.;
+Kp = 0.4;
 Ki = 0.00115;
 
 % Call the helper function to get data and file number

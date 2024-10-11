@@ -7,7 +7,6 @@
 #include "analogPressureSensor.h"
 #include "adjustableSettings.h"
 
-
 // SD card variables
 SdFat SD;
 SdFile dataFile;
@@ -56,9 +55,25 @@ bool initializeSDCard() {
   return true;
 }
 
-// helper function to create a new file
 bool createFile(const char* fileName) {
   if (dataFile.open(fileName, O_RDWR | O_CREAT | O_AT_END)) {
+    dataFile.println(F("Settings:"));
+    dataFile.print(F("KP,")); dataFile.println(KP, 5);
+    dataFile.print(F("KI,")); dataFile.println(KI, 5);
+    dataFile.print(F("KD,")); dataFile.println(KD, 5);
+    dataFile.print(F("Controller Output Threshold,")); dataFile.println(THRESHOLD);
+    dataFile.print(F("Filter alpha,")); dataFile.println(FILTER_ALPHA, 5);
+    dataFile.print(F("Sensor offset,")); dataFile.println(SENSOR_OFFSET, 5);
+    dataFile.print(F("Pressure Read Delay,")); dataFile.println(PRESSURE_READ_DELAY);
+    dataFile.print(F("Interpolation Calculation Delay,")); dataFile.println(INTERP_CALC_DELAY);
+    dataFile.print(F("Controller Delay,")); dataFile.println(CONTROLLER_DELAY);
+    dataFile.print(F("Traj times,"));
+    for (int i = 0; i < TRAJ_SIZE; i++) dataFile.print(TIMES[i]), dataFile.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+    dataFile.print(F("Traj pressures,"));
+    for (int i = 0; i < TRAJ_SIZE; i++) dataFile.print(PRESSURES[i]), dataFile.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+    dataFile.println(F("Data:"));
+
+    // Write header information for the data
     dataFile.println(F("time,pressure,error,integral,cycle_start"));
     dataFile.close();
     return true;
@@ -99,17 +114,30 @@ int getNextFileIndex() {
   }
 }
 
-// write time, pressure, and error data to the SD card
+// write time, pressure, and error data to the SD card or Serial
 void logData(double pressure, double error, double integral, bool cycleComplete, unsigned long currentTime) {
-  dataFile.print(currentTime - testStartTime);
-  dataFile.print(',');
-  dataFile.print(pressure, 2);
-  dataFile.print(',');
-  dataFile.print(error, 2);
-  dataFile.print(',');
-  dataFile.print(integral, 2);
-  dataFile.print(',');
-  dataFile.println(cycleComplete ? "1" : "0");
+  if(USE_SD_CARD){ //write to SD card
+    dataFile.print(currentTime - testStartTime);
+    dataFile.print(',');
+    dataFile.print(pressure, 2);
+    dataFile.print(',');
+    dataFile.print(error, 2);
+    dataFile.print(',');
+    dataFile.print(integral, 2);
+    dataFile.print(',');
+    dataFile.println(cycleComplete ? "1" : "0");
+  }
+  else{ // Otherwise, print to Serial
+    Serial.print(currentTime - testStartTime);
+    Serial.print(",");
+    Serial.print(pressure);
+    Serial.print(",");
+    Serial.print(error);
+    Serial.print(",");
+    Serial.print(integral);
+    Serial.print(",");
+    Serial.println(cycleComplete ? "1" : "0");
+  }
 }
 
 void syncData() {

@@ -18,6 +18,7 @@ extern const int LCD_D7;    // Data Pin 7
 // Tuning variables
 extern const bool TUNE_PRESSURE;
 extern const bool TUNE_VENT;
+extern const bool USE_SD_CARD;
 
 // Pnuematic valve analog write values
 extern const int ANALOG_PRESSURE_MIN;

@@ -4,13 +4,13 @@
 #include <AutoPID.h>
 
 // Custom Inclusions
-#include "adjustableSettings.h"
 #include "sdCardOperations.h"
 #include "analogPressureSensor.h"
 #include "valveControl.h"
 #include "lcdDisplay.h"
 #include "trajectory.h"
 #include "valveTuning.h"
+#include "adjustableSettings.h"
 
 // Declare dynamic variables
 float lastPressureUpdate; // milliseconds
@@ -32,7 +32,9 @@ void endTest(String reason, int cycles){
   closePressureValve();
   vent();
   valvePID.stop();
-  closeSD();
+  if(USE_SD_CARD){
+    closeSD();
+  }
   setLCD(reason, "Cycles: " + String(totalCycles));
   exit(0);
 }
@@ -73,13 +75,32 @@ void setup() {
     // begin tuning process
     setLCD(F("Starting Tuning..."), F("Please wait"));
   }
-  else{ // Normal operation
-    // Initialize SD card
-    if (!initializeSDCard()) {
-      while (1);
+  // otherwise, normal operation
+  else{ 
+  // Initialize SD Card if using it
+    if (USE_SD_CARD) {
+      if (!initializeSDCard()) {
+        while (1);
+      }
+      delay(100);
     }
-    delay(100);
-
+    else{
+      Serial.println(F("Settings:"));
+      Serial.print(F("KP,")); Serial.println(KP, 5);
+      Serial.print(F("KI,")); Serial.println(KI, 5);
+      Serial.print(F("KD,")); Serial.println(KD, 5);
+      Serial.print(F("Controller Output Threshold,")); Serial.println(THRESHOLD);
+      Serial.print(F("Filter alpha,")); Serial.println(FILTER_ALPHA, 5);
+      Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5);
+      Serial.print(F("Pressure Read Delay,")); Serial.println(PRESSURE_READ_DELAY);
+      Serial.print(F("Interpolation Calculation Delay,")); Serial.println(INTERP_CALC_DELAY);
+      Serial.print(F("Controller Delay,")); Serial.println(CONTROLLER_DELAY);
+      Serial.print(F("Traj times,"));
+      for (int i = 0; i < TRAJ_SIZE; i++) Serial.print(TIMES[i]), Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+      Serial.print(F("Traj pressures,"));
+      for (int i = 0; i < TRAJ_SIZE; i++) Serial.print(PRESSURES[i]), Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+      Serial.println(F("Data:"));
+    }
     // Initialize trajectory
     if(!InitializeTrajectory(&traj, TIMES, PRESSURES, TRAJ_SIZE)){
       setLCD(F("Traj Error"), F("Check Serial"));

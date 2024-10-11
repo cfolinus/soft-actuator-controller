@@ -17,7 +17,7 @@ const int VENT_PIN = 5;
    Adjust the values to your specific hardware set-up.*/
 
 const int LCD_RS = 10;   // Register Select
-const int LCD_E = 9;    // Enable
+const int LCD_E = 9;     // Enable
 const int LCD_D4 = 8;    // Data Pin 4
 const int LCD_D5 = 7;    // Data Pin 5
 const int LCD_D6 = 3;    // Data Pin 6
@@ -32,7 +32,7 @@ const int ANALOG_PRESSURE_MAX = 170;
 const int ANALOG_VENT_MIN = 156;
 const int ANALOG_VENT_MAX = 180;
 
-// ========== Tuning Mode ==========
+// ========== Tuning Modes ==========
 /* These settings toggle between the initial tuning process for the pressure and vent solenoid valves,
    and the default operation of the controller. Set 'TUNE_PRESSURE' to 'true' to enable tuning mode 
    for the pressure valve, and 'TUNE_VENT' to 'true' to enable tuning mode for the vent valve. 
@@ -40,6 +40,7 @@ const int ANALOG_VENT_MAX = 180;
 
 const bool TUNE_PRESSURE = false;
 const bool TUNE_VENT = false;
+const bool USE_SD_CARD = false;
 
 // ========== Pressure Sensor Settings ==========
 /* These settings are related to the pressure sensor.
@@ -49,15 +50,15 @@ const bool TUNE_VENT = false;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
 const int OVERPRESSURE_LIMIT = 35;
-const double SENSOR_OFFSET = 0.08; // Offset to calibrate sensor
+const double SENSOR_OFFSET = 0.08; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
 /* These settings determine the frequency at which various tasks are performed.
    You can adjust the delay values to control the frequency in milliseconds. */
 
-const double PRESSURE_READ_DELAY = 5; // milliseconds (100Hz)
-const int INTERP_CALC_DELAY = 30;      // milliseconds (20Hz)
-const int CONTROLLER_DELAY = 30;       // milliseconds (20Hz)
+const double PRESSURE_READ_DELAY = 15; // milliseconds (100Hz)
+const int INTERP_CALC_DELAY = 30;      // milliseconds
+const int CONTROLLER_DELAY = 30;       // milliseconds 
 
 // ========== PID Controller Settings ==========
 /* These settings configure the PID controller that regulates pressure.
