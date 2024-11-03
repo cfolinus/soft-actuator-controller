@@ -1,19 +1,20 @@
 function [trajTimes, trajPressures] = getTrajectory(trajSelect)
+    magnitude = 20;
     % Define trajectories
     stepTimes = [0, 100, 2000, 2100, 3000] / 1000; % Convert from millisec to sec
-    stepPressures = [0, 15, 15, 0, 0];
+    stepPressures = [0, magnitude, magnitude, 0, 0];
 
-    triTimes = [0, 1500, 3000] / 1000;
-    triPressures = [0, 20, 0]; 
+    triTimes = [0, 1500, 1600, 3000] / 1000;
+    triPressures = [0, magnitude, magnitude, 0]; 
 
-    sawTimes = [0, 3000, 3100] / 1000;
-    sawPressures = [0, 15, 0];
+    sawTimes = [0, 3000, 3100, 3200, 3500] / 1000;
+    sawPressures = [0, magnitude, magnitude, 0, 0];
 
-    revSawTimes = [0, 100, 3100] / 1000;
-    revSawPressures = [0, 15, 0];
+    revSawTimes = [0, 100, 200, 3100, 3500] / 1000;
+    revSawPressures = [0, magnitude, magnitude, 0, 0];
 
     sinTimes = [0, 1.111, 2.222, 3.333, 4.444, 5.555, 6.666, 7.777, 8.888, 10];
-    sinPressures = 15 * [0, sin(pi/9), sin(pi/9*2), sin(pi/9*3), sin(pi/9*4), sin(pi/9*5), sin(pi/9*6), sin(pi/9*7), sin(pi/9*8), sin(pi)];
+    sinPressures = magnitude * [0, sin(pi/9), sin(pi/9*2), sin(pi/9*3), sin(pi/9*4), sin(pi/9*5), sin(pi/9*6), sin(pi/9*7), sin(pi/9*8), sin(pi)];
 
     burstTimes = [0, 5000, 10000, 15000, 20000, 25000, 30000, 35000,...
         40000, 45000, 50000, 55000, 60000, 65000, ...

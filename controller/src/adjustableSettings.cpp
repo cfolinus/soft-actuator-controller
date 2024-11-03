@@ -23,6 +23,13 @@ const int LCD_D5 = 7;    // Data Pin 5
 const int LCD_D6 = 3;    // Data Pin 6
 const int LCD_D7 = 2;    // Data Pin 7
 
+// ========== Filename Settings ==========
+/* String for name of file series. Controller will automatically generate csv
+   file with lowest available integer appended to the end, so as to not overwrite 
+   existing data files on the SD card */
+
+const char fileName[] = "annie_character";
+
 // ========== Pneumatic Valve Settings ==========
 /* These settings control the pressure applied by the pneumatic valves.
    Adjust the min and max analog write values to calibrate the pressure range. */
@@ -40,7 +47,7 @@ const int ANALOG_VENT_MAX = 180;
 
 const bool TUNE_PRESSURE = false;
 const bool TUNE_VENT = false;
-const bool USE_SD_CARD = false;
+const bool USE_SD_CARD = true;
 
 // ========== Pressure Sensor Settings ==========
 /* These settings are related to the pressure sensor.
@@ -49,14 +56,14 @@ const bool USE_SD_CARD = false;
 
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 35;
+const int OVERPRESSURE_LIMIT = 25; // units depend on USE_KPA
 const double SENSOR_OFFSET = 0.08; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
 /* These settings determine the frequency at which various tasks are performed.
    You can adjust the delay values to control the frequency in milliseconds. */
 
-const double PRESSURE_READ_DELAY = 15; // milliseconds (100Hz)
+const double PRESSURE_READ_DELAY = 15; // milliseconds
 const int INTERP_CALC_DELAY = 30;      // milliseconds
 const int CONTROLLER_DELAY = 30;       // milliseconds 
 
@@ -68,8 +75,8 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
 const double THRESHOLD = 10;
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
-const double KP = 0.4;    // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
-const double KI = 0.00115;
+const double KP = 0.135;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
+const double KI = 0.00005;
 const double KD = 0.0;
 
 // ========== Trajectory Settings ==========
@@ -88,37 +95,39 @@ const double KD = 0.0;
 */
 
 // Step Function Trajectory
-const float TIMES[] = {0, 100, 2000, 2100, 3000}; // milliseconds
-const double PRESSURES[] = {0, 15, 15, 0, 0};    // PSI or Kpa
+// const float TIMES[] = {0, 100, 2000, 2100, 3000}; // milliseconds
+// const double PRESSURES[] = {0, 20, 20, 0, 0};    // PSI or Kpa
 
 // Uncomment to use a different trajectory:
 
 // Triangle Trajectory
-// const float TIMES[] = {0, 1500, 3000}; // milliseconds
-// const double PRESSURES[] = {0, 20, 0}; // PSI or Kpa
+// const float TIMES[] = {0, 1500, 1600, 3000, 3500}; // milliseconds
+// const double PRESSURES[] = {0, 20, 20, 0, 0}; // PSI or Kpa
 
 //Sawtooth Trajectory
-// const float TIMES[] = {0, 3000, 3100, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 15, 0, 0};    // PSI or Kpa
+// const float TIMES[] = {0, 3000, 3100, 3200, 3500}; // milliseconds
+// const double PRESSURES[] = {0, 20, 20, 0, 0};    // PSI or Kpa
 
 // Reverse Sawtooth Trajectory
-// const float TIMES[] = {0, 100, 3100, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 15, 0, 0};   // PSI or Kpa
+// const float TIMES[] = {0, 100, 200, 3100, 3500}; // milliseconds
+// const double PRESSURES[] = {0, 20, 20, 0, 0};   // PSI or Kpa
 
 // Sinusoidal Trajectory
-// const float TIMES[] = {0, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 10000}; // milliseconds
-// const double PRESSURES[] = {
-//     0, 
-//     20 * sin(M_PI / 9 * 1), 
-//     20 * sin(M_PI / 9 * 2), 
-//     20 * sin(M_PI / 9 * 3), 
-//     20 * sin(M_PI / 9 * 4), 
-//     20 * sin(M_PI / 9 * 5), 
-//     20 * sin(M_PI / 9 * 6), 
-//     20 * sin(M_PI / 9 * 7), 
-//     20 * sin(M_PI / 9 * 8), 
-//     0 
-// }; // PSI or Kpa
+const int amp = 20; // adjust amplitude of sinusoidal wave
+const float TIMES[] = {0, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 10000, 10500}; // milliseconds
+const double PRESSURES[] = {
+    0, 
+    amp * sin(M_PI / 9 * 1), 
+    amp * sin(M_PI / 9 * 2), 
+    amp * sin(M_PI / 9 * 3), 
+    amp * sin(M_PI / 9 * 4), 
+    amp * sin(M_PI / 9 * 5), 
+    amp * sin(M_PI / 9 * 6), 
+    amp * sin(M_PI / 9 * 7), 
+    amp * sin(M_PI / 9 * 8), 
+    0,
+    0
+}; // PSI or Kpa
 
 // Burst Ramp Trajectory
 // const float TIMES[] = {0, 5000, 10000, 15000, 20000, 

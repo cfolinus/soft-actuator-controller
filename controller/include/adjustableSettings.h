@@ -20,6 +20,9 @@ extern const bool TUNE_PRESSURE;
 extern const bool TUNE_VENT;
 extern const bool USE_SD_CARD;
 
+// Filename settings
+extern const char fileName[];
+
 // Pnuematic valve analog write values
 extern const int ANALOG_PRESSURE_MIN;
 extern const int ANALOG_PRESSURE_MAX;

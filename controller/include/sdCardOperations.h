@@ -5,7 +5,7 @@
 #include <SPI.h>
 
 extern unsigned long testStartTime;
-extern char fileName[20];
+extern char specificFileName[50];
 
 bool initializeSDCard();
 void closeSD();

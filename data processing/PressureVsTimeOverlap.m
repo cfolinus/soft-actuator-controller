@@ -18,7 +18,7 @@ end
 
 % Assumes time in column 1, pressure in column 2, error in column 3,
 % integral error in column 4, and cycle completion in column 5
-time = data(2:end, 1) / 1000; % Convert from milliseconds to seconds
+time = data(2:end, 1)/1000; % Convert from milliseconds to seconds
 pressure = data(2:end, 2);
 % New column indicating the completion of a cycle
 cycle_complete = data(2:end, 5);

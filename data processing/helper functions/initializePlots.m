@@ -1,4 +1,9 @@
-function [pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot] = initializePlots()
+function [pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot] = initializePlots(useKPA)
+    pressureUnit = 'PSI';  % Default is PSI
+    if useKPA
+        pressureUnit = 'kPa';
+    end
+
     % Initialize the plotting figure
     figure('Position', [100, 100, 1200, 800]); % Larger figure
     t = tiledlayout("vertical", 'TileSpacing', 'tight', 'Padding', 'compact');
@@ -8,7 +13,7 @@ function [pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot,
     % Create subplots and return their handles
     ax1 = nexttile; hold(ax1, 'on');
     pressurePlot = plot(ax1, NaN, NaN, '-o', 'LineWidth', 2, 'DisplayName', 'Measured Pressure');
-    ylabel(ax1, 'PSI', 'FontSize', 16);
+    ylabel(ax1, ['Pressure (' pressureUnit ')'], 'FontSize', 16);
     grid(ax1, 'on'); legend(ax1, 'show', 'Location', 'best');
 
     ax2 = nexttile; controlSignalPlot = plot(ax2, NaN, NaN, 'r-', 'LineWidth', 2, 'DisplayName', 'Control Signal');

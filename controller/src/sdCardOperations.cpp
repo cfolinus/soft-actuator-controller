@@ -11,23 +11,19 @@
 SdFat SD;
 SdFile dataFile;
 const int SD_CS_PIN = 4;
-char fileName[20];
 unsigned long testStartTime;
+char specificFileName[50];
 
 // Function to initialize the SD card
 bool initializeSDCard() {
   setLCD(F("SD init..."), F("Please wait"));
 
   // Initialize SD card pins
-  // be sure to use the correct pinnouts for your board
   pinMode(12, INPUT); // MISO
   pinMode(11, OUTPUT); // MOSI
   pinMode(13, OUTPUT); // SCK
   pinMode(SD_CS_PIN, OUTPUT); // CS
 
-  // Initialize the SD card at SPI_HALF_SPEED to avoid bus errors with
-  // breadboards. Use SPI_FULL_SPEED for better performance.
-  // THIS COULD BE PART OF THE ISSUE?
   if (!SD.begin(SD_CS_PIN, SD_SCK_MHZ(8))) {
     setLCD(F("SD Init"), F("Failed"));
     return false;
@@ -36,32 +32,51 @@ bool initializeSDCard() {
 
   // Create a new file for each new cycle test
   int fileIndex = getNextFileIndex();
-  snprintf(fileName, sizeof(fileName), "cycle_test_%d.csv", fileIndex);
+  snprintf(specificFileName, sizeof(specificFileName), "%s_%d.csv", fileName, fileIndex);  // Store specific file name
   Serial.print(F("Creating file: "));
-  Serial.println(fileName);
-  if (!createFile(fileName)) {
+  Serial.println(specificFileName);
+
+  if (!createFile(specificFileName)) {
     setLCD(F("File create fail"), F("Check SD Card"));
     return false;
   }
 
-  // Open the file for writing
-  if (!openFile(fileName)) {
+  if (!openFile(specificFileName)) {
     setLCD(F("File open fail"), F("Check SD Card"));
     return false;
   }
 
   Serial.println(F("SD card setup complete."));
-  delay(2000); // delay for readability
+  delay(2000);  // delay for readability
   return true;
+}
+
+
+// helper function to get the next file index
+int getNextFileIndex() {
+  int index = 0;
+
+  size_t bufferSize = strlen(fileName) + 10; 
+  char tempFileName[bufferSize]; 
+  
+  while (true) {
+    snprintf(tempFileName, bufferSize, "%s_%d.csv", fileName, index);  
+    if (!SD.exists(tempFileName)) {
+      return index;
+    }
+    index++;
+  }
 }
 
 bool createFile(const char* fileName) {
   if (dataFile.open(fileName, O_RDWR | O_CREAT | O_AT_END)) {
     dataFile.println(F("Settings:"));
+    dataFile.print(F("filename,")); dataFile.println(fileName);  // Log the full filename
+    dataFile.print(F("Use KPA?,")); dataFile.println(USE_KPA);
     dataFile.print(F("KP,")); dataFile.println(KP, 5);
     dataFile.print(F("KI,")); dataFile.println(KI, 5);
     dataFile.print(F("KD,")); dataFile.println(KD, 5);
-    dataFile.print(F("Controller Output Threshold,")); dataFile.println(THRESHOLD);
+    dataFile.print(F("Traj Follow Error Threshold,")); dataFile.println(THRESHOLD);
     dataFile.print(F("Filter alpha,")); dataFile.println(FILTER_ALPHA, 5);
     dataFile.print(F("Sensor offset,")); dataFile.println(SENSOR_OFFSET, 5);
     dataFile.print(F("Pressure Read Delay,")); dataFile.println(PRESSURE_READ_DELAY);
@@ -97,20 +112,6 @@ bool openFile(const char* fileName) {
 void closeSD() {
   if (dataFile) {
     dataFile.close();
-  }
-}
-
-// helper function to get the next file index
-// ensures data is not written over existing files
-// when starting new cycle tests
-int getNextFileIndex() {
-  int index = 0;
-  while (true) {
-    snprintf(fileName, sizeof(fileName), "cycle_test_%d.csv", index);
-    if (!SD.exists(fileName)) {
-      return index;
-    }
-    index++;
   }
 }
 

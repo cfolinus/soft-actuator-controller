@@ -1,45 +1,42 @@
-function receiveAndPlotData(s, filename, pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot, kpValue, kiValue, kdValue)
+function receiveAndPlotData(s, csvFileName, pressurePlot, ...
+    controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, ...
+    kiIntegralPlot, kpValue, kiValue, kdValue, useKPA)
     disp('Receiving real-time data...');
     idx = 1;
     prevError = 0;  % Store the previous error for derivative calculation
 
+    % Set the pressure unit based on the USE_KPA flag
+    pressureUnit = 'PSI';  % Default is PSI
+    if useKPA
+        pressureUnit = 'kPa';
+    end
+
     while true
         dataLine = readline(s);
+        data = str2double(strsplit(dataLine, ','));
 
-        % Ensure that dataLine is a valid character vector or string
-        if ischar(dataLine) || isstring(dataLine)
-            % Check if dataLine is empty or contains no commas
-            if isempty(dataLine) || ~contains(dataLine, ',')
-                continue;  % Skip if data is invalid
-            end
+        % Ensure the data has the expected number of fields (5)
+        if numel(data) == 5
+            [currentTime, currentPressure, currentError, currentIntegralError, currentCycleStart, currentControlSignal] = processData(data, kpValue, kiValue, kdValue, prevError);
 
-            % Split and convert to numbers
-            data = str2double(strsplit(dataLine, ','));
+            % Append data to arrays and increment index
+            time(idx) = currentTime;
+            pressure(idx) = currentPressure;
+            error(idx) = currentError;
+            integral_error(idx) = currentIntegralError;
+            control_signal(idx) = currentControlSignal;
+            cycle_start(idx) = currentCycleStart;
+            idx = idx + 1;
 
-            % Ensure the data has the expected number of fields (5)
-            if numel(data) == 5
-                % Process data, calculate control signal based on Kp, Ki, Kd
-                [currentTime, currentPressure, currentError, currentIntegralError, currentCycleStart, currentControlSignal] = processData(data, kpValue, kiValue, kdValue, prevError);
+            % Update plots
+            updateLivePlots(pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot, time, pressure, control_signal, error, integral_error, kpValue, kiValue);
 
-                % Update previous error for the next iteration
-                prevError = currentError;
+            % Update ylabel of pressure plot dynamically
+            ylabel(pressurePlot.Parent, ['Pressure (' pressureUnit ')'], 'FontSize', 16);
 
-                % Append data to arrays and increment index
-                time(idx) = currentTime;
-                pressure(idx) = currentPressure;
-                error(idx) = currentError;
-                integral_error(idx) = currentIntegralError;
-                control_signal(idx) = currentControlSignal;  % Ensure control signal is updated
-                cycle_start(idx) = currentCycleStart;  % Read cycle_start from serial
-                idx = idx + 1;
-
-                % Update plots (including control signal)
-                updateLivePlots(pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot, time, pressure, control_signal, error, integral_error, kpValue, kiValue);
-
-                % Write real-time data to the CSV file without the control signal
-                dataRow = {currentTime, currentPressure, currentError, currentIntegralError, currentCycleStart};
-                writecell(dataRow, filename, 'WriteMode', 'append');
-            end
+            % Write real-time data to the CSV file without the control signal
+            dataRow = {currentTime, currentPressure, currentError, currentIntegralError, currentCycleStart};
+            writecell(dataRow, csvFileName, 'WriteMode', 'append');
         end
 
         % Check if the figure window has been closed
@@ -54,6 +51,20 @@ function receiveAndPlotData(s, filename, pressurePlot, controlSignalPlot, errorP
             break;
         end
     end
-    disp('Data saved to CSV file.');
+    disp(['Data saved to CSV file: ', csvFileName]);
 end
 
+% Example processData function
+function [currentTime, currentPressure, currentError, currentIntegralError, currentCycleStart, currentControlSignal] = processData(data, kpValue, kiValue, kdValue, prevError)
+    currentTime = data(1) / 1000;  % Convert time to seconds
+    currentPressure = data(2);
+    currentError = data(3);
+    currentIntegralError = data(4);
+    currentCycleStart = data(5);  % Read cycle_start from the serial input
+    
+    % Calculate derivative error (change in error over time)
+    derivativeError = (currentError - prevError) / currentTime;
+    
+    % Calculate control signal based on PID formula
+    currentControlSignal = kpValue * currentError + kiValue * currentIntegralError + kdValue * derivativeError;
+end

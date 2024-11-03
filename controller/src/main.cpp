@@ -86,10 +86,12 @@ void setup() {
     }
     else{
       Serial.println(F("Settings:"));
+      Serial.print(F("filename,")); Serial.println(fileName);
+      Serial.print(F("Use KPA?,")); Serial.println(USE_KPA);
       Serial.print(F("KP,")); Serial.println(KP, 5);
       Serial.print(F("KI,")); Serial.println(KI, 5);
       Serial.print(F("KD,")); Serial.println(KD, 5);
-      Serial.print(F("Controller Output Threshold,")); Serial.println(THRESHOLD);
+      Serial.print(F("Traj Follow Error Threshold,")); Serial.println(THRESHOLD);
       Serial.print(F("Filter alpha,")); Serial.println(FILTER_ALPHA, 5);
       Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5);
       Serial.print(F("Pressure Read Delay,")); Serial.println(PRESSURE_READ_DELAY);
@@ -119,7 +121,7 @@ void setup() {
     }
     delay(2000);
     // begin cycle test
-    setLCD(String(fileName), "Cycles: " + String(totalCycles));
+    setLCD(String(specificFileName), "Cycles: " + String(totalCycles));
     testStartTime = millis();
     trajStartTime = millis();
     traj.reset();
@@ -160,7 +162,7 @@ void loop() {
     // Check if cycle is complete
     if (cycleComplete) {
       totalCycles++;
-      setLCD(String(fileName), "Cycles: " + String(totalCycles));
+      setLCD(String(specificFileName), "Cycles: " + String(totalCycles));
       valvePID.reset();  // anti-windup call
       traj.reset();
       logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete, currentMillis);
