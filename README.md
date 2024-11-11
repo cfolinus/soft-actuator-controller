@@ -1,4 +1,4 @@
-# soft-actuator-testing
+# soft-actuator-controller
 The Trajectory Cycle program serves as a means of running a cyclic actuator inflation test. 
 This program is designed for the arduino nano platform and is intended to be used with a
 2/2 NC solenoid valves arranged in a fill/bleed circuit. The program is designed to be used with any soft pneumatic actuator, and requires tuning of PID gain values for different actuators. Zeigler-Nichols method is a recommended starting point.
