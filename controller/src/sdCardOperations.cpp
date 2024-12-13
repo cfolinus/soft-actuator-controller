@@ -10,7 +10,7 @@
 // SD card variables
 SdFat SD;
 SdFile dataFile;
-const int SD_CS_PIN = 4;
+const int SD_CS_PIN = 10;
 unsigned long testStartTime;
 char specificFileName[50];
 
@@ -68,6 +68,7 @@ int getNextFileIndex() {
   }
 }
 
+// Function for writing data to files if USE_SD_CARD is true
 bool createFile(const char* fileName) {
   if (dataFile.open(fileName, O_RDWR | O_CREAT | O_AT_END)) {
     dataFile.println(F("Settings:"));

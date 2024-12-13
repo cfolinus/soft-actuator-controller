@@ -1,5 +1,5 @@
 clear; close all;
-%Adjust as necessary
+% Adjust as necessary
 addpath(genpath('helper functions'));
 
 % Call the helper function to get data, file name, and Kp/Ki values
@@ -16,16 +16,6 @@ pressure = data(2:end, 2);
 error = data(2:end, 3);
 integral_error = data(2:end, 4); 
 
-% Select trajectory [period and magnitude adjustable in function def]
-% 1 for step
-% 2 for triangle
-% 3 for sawtooth
-% 4 for reverse sawtooth
-% 5 for sine wave
-% 6 for burst ramp
-trajSelect = 1;
-[trajTimes, trajPressures] = getTrajectory(trajSelect);
-
 % Compute the control signal using PID formula with provided integral error
 control_signal = Kp * error + Ki * integral_error;
 
@@ -35,45 +25,72 @@ plotTitle = strrep(fileName, '_', ' ');
 % Create a vertical figure with tiledlayout
 figure;
 t = tiledlayout("vertical", 'TileSpacing', 'tight', 'Padding', 'compact');
-xlabel(t, 'Time (s)', 'FontSize', 20, 'FontWeight', 'Bold')
-title(t, plotTitle, "FontSize", 26, ...
-    'FontWeight', 'Bold');
+xlabel(t, 'Time (s)', 'FontSize', 30, 'FontWeight', 'Bold')
+%title(t, plotTitle, "FontSize", 26, 'FontWeight', 'Bold');
 
-% First subplot for pressure and setPressures
+% Initialize a container for all legends
+legendEntries = [];
+legendLabels = {};
+
+% First subplot for pressure
 nexttile;
 hold on;
-plot(time, pressure, '-o', 'DisplayName', 'Measured Pressure');
-plot(trajTimes, trajPressures, 'k--', 'LineWidth', 3, ...
-    'DisplayName', 'Ideal Trajectory');
-ylabel('PSI');
+p1 = plot(time, pressure, '-o', 'DisplayName', 'Measured Pressure');
+ylabel('psi', 'FontSize', 26);
 grid on;
-legend show;
+
+% Store legend information
+legendEntries(end+1) = p1;
+legendLabels{end+1} = 'Measured Pressure';
 
 % Second subplot for control signal
 nexttile;
-plot(time, control_signal, 'r-', 'DisplayName', 'Control Signal');
+p2 = plot(time, control_signal, 'r-', 'DisplayName', 'Control Signal');
 grid on;
-legend show;
 
-% Third subblot for error vs. time
+% Store legend information
+legendEntries(end+1) = p2;
+legendLabels{end+1} = 'Control Signal';
+
+% Third subplot for error vs. time
 nexttile;
-plot(time, error, 'b-', 'DisplayName', 'Error');
+p3 = plot(time, error, 'b-', 'DisplayName', 'Error');
 grid on;
-legend show;
+
+% Store legend information
+legendEntries(end+1) = p3;
+legendLabels{end+1} = 'Error';
 
 % Fourth subplot for integral vs. time
 nexttile;
-plot(time, integral_error, 'g-', 'DisplayName', 'Integral');
+p4 = plot(time, integral_error, 'g-', 'DisplayName', 'Integral');
 grid on;
-legend show;
+
+% Store legend information
+legendEntries(end+1) = p4;
+legendLabels{end+1} = 'Integral';
 
 % Fifth subplot for Kp*error and Ki*integral vs. time
 nexttile;
 hold on;
-plot(time, Kp * error, 'm-', 'DisplayName', 'Kp * Error');
-plot(time, Ki * integral_error, 'c-', 'DisplayName', 'Ki * Integral');
+p5 = plot(time, Kp * error, 'm-', 'DisplayName', 'Kp * Error');
+p6 = plot(time, Ki * integral_error, 'c-', 'DisplayName', 'Ki * Integral');
 grid on;
-legend show;
+
+% Store legend information
+legendEntries(end+1) = p5;
+legendLabels{end+1} = 'Kp * Error';
+legendEntries(end+1) = p6;
+legendLabels{end+1} = 'Ki * Integral';
+
+% Add a legend below the tiled layout
+lgd = legend(legendEntries, legendLabels, ...
+    'Orientation', 'horizontal', ... % Arrange legend entries horizontally
+    'FontSize', 20, ...              % Increase font size for readability
+    'Box', 'on');                    % Add a border around the legend
+
+% Adjust the legend position below the tiled layout
+lgd.Layout.Tile = 'south';
 
 % Improve plot appearance
 improvePlot();

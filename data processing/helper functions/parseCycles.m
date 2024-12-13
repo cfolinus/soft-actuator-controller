@@ -2,7 +2,6 @@ function cycles = parseCycles(time, pressure, cycle_complete)
     % Identify end indices of each cycle based on the cycle_complete column
     end_indices = find(cycle_complete == 1);
 
-    % Initialize cell array to store cycles data
     cycles = {};
 
     % Extract and store each cycle's data

@@ -19,6 +19,7 @@ end
 % Assumes time in column 1, pressure in column 2, cycle completion in column 5
 time = data(2:end, 1) / 1000; % Convert from milliseconds to seconds
 pressure = data(2:end, 2);
+%pressure = data(2:end, 2) * 6.89476; % convert fromn psi to KPA
 cycle_complete = data(2:end, 5); % New column indicating the completion of a cycle
 
 % Apply digital low-pass filter if toggle is on
@@ -78,32 +79,44 @@ hold on;
 % 4 for reverse sawtooth
 % 5 for sine wave
 % 6 for burst ramp
-trajSelect = 1;
-[trajTimes, trajPressures] = getTrajectory(trajSelect);
+trajSelect = 5;
+magnitude = 137.8; % unitless for purposes of graphing
+[trajTimes, trajPressures] = getTrajectory(trajSelect, magnitude);
+
+darkGreen = [0, 0.8, 0];
 
 % Plot the mean pressure line
-plot(normalized_time, mean_pressure, 'b', 'LineWidth', 2);
+plot(normalized_time, mean_pressure, 'Color', 'r', 'LineWidth', 6);
+%plot(normalized_time, mean_pressure, 'b', 'LineWidth', 6);
 
 % Plot the shaded area for the confidence interval
 fill([normalized_time, fliplr(normalized_time)], ...
     [mean_pressure - conf_interval, fliplr(mean_pressure + conf_interval)], ...
-    'b', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+    'r', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
 
 plot(trajTimes, trajPressures, 'k--', 'LineWidth', 3);
 
-% Add labels and title
-xlabel('Time (s)', 'FontSize', 14, 'FontWeight', 'Bold'); % Now in seconds
-ylabel('Pressure (PSI)', 'FontSize', 14, 'FontWeight', 'Bold');
-title(sprintf('Pressure vs Time with 95%% Confidence Interval - File %s', ...
-    fileNumber), 'FontSize', 16, 'FontWeight', 'Bold');
+% Remove padding around the plot
+axis tight; % Ensures axes are tightly fitted to the data
+set(gca, 'LooseInset', max(get(gca, 'TightInset'), 0.02)); % Removes extra padding
 
 % Improve plot appearance
+ylim([0,155])
+xlim([0,10])
 grid on;
 hold off;
 improvePlot();
 
+% Set the font size for tick marks
+set(gca, 'FontSize', 24); 
+
+% Add labels and title
+xlabel('Time (s)', 'FontSize', 32, 'FontWeight', 'Bold');
+ylabel('Pressure (kPa)', 'FontSize', 32, 'FontWeight', 'Bold');
+
 % Set legend
-legend('Mean Pressure', '95% Confidence Interval', 'Ideal Trajectory', 'FontSize', 20);
+legend('Mean Pressure', '95% Confidence Interval', 'Ideal Trajectory', ...
+    'FontSize', 28);
 
 %% Helper Function
 function [data, fileName, Kp, Ki] = getDataFile()

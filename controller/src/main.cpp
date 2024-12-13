@@ -17,7 +17,7 @@ float lastPressureUpdate; // milliseconds
 float lastInterpUpdate; // milliseconds
 float cycleStartTime; // milliseconds
 float trajStartTime; // milliseconds
-int totalCycles = 0;
+int totalCycles = 0; 
 unsigned long deltaT;
 bool cycleComplete = false;
 double desiredPressure; // PSI
@@ -43,8 +43,8 @@ void setup() {
   // Initialize Serial w/ Baud Rate 115200
   Serial.begin(115200);
   // Initialize LCD
-  lcd.begin(16, 2);
-  lcd.clear();
+  lcd.init();
+  lcd.backlight();
   // Initialize valves and pressure sensor
   pinMode(PRESSURE_PIN, OUTPUT);
   pinMode(VENT_PIN, OUTPUT);

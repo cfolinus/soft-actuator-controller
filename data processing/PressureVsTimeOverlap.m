@@ -37,7 +37,8 @@ end
 % 5 for sine wave
 % 6 for burst ramp
 trajSelect = 1;
-[trajTimes, trajPressures] = getTrajectory(trajSelect);
+magnitude = 20;
+[trajTimes, trajPressures] = getTrajectory(trajSelect, magnitude);
 
 % Identify end indices of each cycle based on the cycle_complete column
 end_indices = find(cycle_complete == 1);
@@ -71,19 +72,25 @@ for i = 1:length(cycles)
 end
 
 % Plot the ideal trajectory
-plot(trajTimes, trajPressures, 'k--', 'LineWidth', 3,...
+plot(trajTimes, trajPressures, 'k--', 'LineWidth', 5,...
     'DisplayName', 'Ideal Trajectory');
-
-% Add labels and title
-xlabel('Time (s)', 'FontSize', 20, 'FontWeight', 'Bold');
-ylabel('Pressure (PSI)', 'FontSize', 20, 'FontWeight', 'Bold');
-title(sprintf('Cycle Test %s', fileNumber), 'FontSize', 26,...
-    'FontWeight', 'Bold');
-%title('15 PSI step funciton', 'FontSize', 26, 'FontWeight', 'Bold');
 
 % Improve plot appearance
 grid on;
 improvePlot();
 
+% Add labels and title
+xlabel('Time (s)', 'FontSize', 32, 'FontWeight', 'Bold');
+ylabel('Pressure (psi)', 'FontSize', 32, 'FontWeight', 'Bold');
+%title(sprintf('Cycle Test %s', fileNumber), 'FontSize', 26,...
+% 'FontWeight', 'Bold');
+
 % Set legend size
 lgd = legend('FontSize', 20);
+
+% Adjust figure properties to remove white space
+set(gca, 'LooseInset', max(get(gca, 'TightInset'), 0.02)); % Tightens the axes
+set(gcf, 'Position', [100, 100, 800, 600]);                % Resizes the figure
+
+% Export the figure with minimal margins
+set(gcf, 'PaperPositionMode', 'auto');  % Ensures the printed/exported figure matches screen display

@@ -1,5 +1,4 @@
-function [trajTimes, trajPressures] = getTrajectory(trajSelect)
-    magnitude = 20;
+function [trajTimes, trajPressures] = getTrajectory(trajSelect, magnitude)
     % Define trajectories
     stepTimes = [0, 100, 2000, 2100, 3000] / 1000; % Convert from millisec to sec
     stepPressures = [0, magnitude, magnitude, 0, 0];
@@ -20,7 +19,7 @@ function [trajTimes, trajPressures] = getTrajectory(trajSelect)
         40000, 45000, 50000, 55000, 60000, 65000, ...
         70000, 75000, 80000, 80100, 80500] / 1000; % Convert from millisec to sec
     burstPressures = [0, 5, 5, 10, 10, 15, 15, 20, 20,...
-        25, 25, 30, 30, 35, 35, 40, 40, 0, 0]; % PSI
+        25, 25, 30, 30, 35, 35, 40, 40, 0, 0]; 
 
     % Select trajectory
     switch trajSelect

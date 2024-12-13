@@ -36,7 +36,6 @@ void AutoPID::setTimeStep(unsigned long timeStep){
   _timeStep = timeStep;
 }
 
-
 bool AutoPID::atSetPoint(double threshold) {
   return abs(*_setpoint - *_input) <= threshold;
 }//bool AutoPID::atSetPoint

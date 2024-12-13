@@ -6,7 +6,8 @@ function [currentTime, currentPressure, currentError, currentIntegralError, curr
     currentCycleStart = data(5);  % Read cycle_start from the serial input
     
     % Calculate derivative error (change in error over time)
-    derivativeError = (currentError - prevError);  % Assuming equal time steps for simplicity
+    % Assuming equal time steps for simplicity
+    derivativeError = (currentError - prevError);  
 
     % Calculate control signal using PID formula
     currentControlSignal = kpValue * currentError + kiValue * currentIntegralError + kdValue * derivativeError;

@@ -81,7 +81,6 @@ function [csvFileName, kpValue, kiValue, kdValue, useKPA] = readAndWriteSettings
     writecell({'time', 'pressure', 'error', 'integral', 'cycle_start'}, csvFileName, 'WriteMode', 'append');
 end
 
-% Helper function to create a unique CSV filename
 function csvFileName = createUniqueFileName(baseFileName)
     % Initialize counter
     fileNumber = 1;

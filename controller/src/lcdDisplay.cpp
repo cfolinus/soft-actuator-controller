@@ -1,14 +1,16 @@
-#include <Arduino.h>
-#include "lcdDisplay.h"
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include "adjustableSettings.h"
 
-// Initialize the LiquidCrystal object with externally defined pin names
-LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+// Initialize the I2C LCD object
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-void setLCD(String text1, String value) {
+// Write two lines to the LCD display
+void setLCD(String text1, String text2) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print(text1);
   lcd.setCursor(0, 1);
-  lcd.print(value);
+  lcd.print(text2);
 }
+

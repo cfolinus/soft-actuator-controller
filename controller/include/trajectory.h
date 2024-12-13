@@ -4,7 +4,12 @@
 #include <Arduino.h>
 
 // Define a fixed max trajectory size to avoid dynamic allocation
-#define MAX_TRAJECTORY_SIZE 30  // Adjust this size as needed
+// Adjust size of max trajectory with caution.
+// RAM usage beyon 90% stops the program from running due to memory overflow
+
+// RAM usage beyond ~84% may cause the controller to not behave correctly
+// when being used in tandem with the MATLAB serial plotting function
+#define MAX_TRAJECTORY_SIZE 15  // Adjust this size as needed
 
 class Trajectory {
 public:
