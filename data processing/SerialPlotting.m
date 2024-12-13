@@ -5,7 +5,8 @@ close all; clear; clc;
 addpath(genpath('helper functions'));
 
 % Initialize Serial Communication
-s = initializeSerial("/dev/tty.usbserial-AQ01KRCM", 115200);
+% Change to match the serial port on your comptuer
+s = initializeSerial("/dev/cu.usbserial-A10LT2ZA", 115200);
 
 % Call the function to read settings, create the CSV file, and get PID values
 [csvFileName, kpValue, kiValue, kdValue, useKPA] = readAndWriteSettings(s);
