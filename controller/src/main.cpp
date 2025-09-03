@@ -56,10 +56,46 @@ void setup() {
   // vent any air in the system
   closeValves();
   delay(20); // 20 millisecond delay between signal and mechanical valve response
-  openVentValve();
+
+  // TODO TROUBLESHOOT VENTING
+  closePressureValve();
   setLCD(F("Venting..."), F("Please wait"));
+  Serial.println("NEW RUN");
+  Serial.println("Venting");
+  Serial.println(analogRead(SENSOR_PIN));
+  openVentValve();
   delay(5000); // hold for 5 seconds to fully vent
-  closeValves(); 
+  Serial.println(analogRead(SENSOR_PIN));
+  closeValves();  
+
+
+  delay(5000);
+
+  // TODO TROUBLESHOOT PRESSURIZING
+  closeVentValve();
+  setLCD(F("Pressurizing..."), F("Please wait"));
+  Serial.println("Pressurizing");
+  Serial.println(analogRead(SENSOR_PIN));
+  openPressureValve();
+  delay(5000); // hold for 5 seconds to fully pressurize
+  Serial.println(analogRead(SENSOR_PIN));
+
+  closePressureValve();
+  Serial.println("Venting");
+  Serial.println(analogRead(SENSOR_PIN));
+  openVentValve();
+  delay(5000); // hold for 5 seconds to fully vent
+  Serial.println(analogRead(SENSOR_PIN));
+  closeValves();  
+
+  // Serial.println("Venting");
+  // closePressureValve();
+  // openVentValve();
+  // delay(5000);
+  // Serial.println(analogRead(SENSOR_PIN));
+  // closeValves(); 
+  // Serial.println(analogRead(SENSOR_PIN));
+
 
   if(TUNE_PRESSURE || TUNE_VENT){ // Solenoind Valve Tuning Mode    
     // Ensure only one valve is set for tuning
@@ -102,6 +138,7 @@ void setup() {
       Serial.print(F("Traj pressures,"));
       for (int i = 0; i < TRAJ_SIZE; i++) Serial.print(PRESSURES[i]), Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
       Serial.println(F("Data:"));
+      Serial.println(F("UPDATED TEXT"));
     }
     // Initialize trajectory
     if(!InitializeTrajectory(&traj, TIMES, PRESSURES, TRAJ_SIZE)){
@@ -136,7 +173,12 @@ void loop() {
     endTest(F("Stop Pressed"), totalCycles);
   }
 
-  // Pressure valve tuning
+  // TODO REMOVE THIS
+  // Print current reading on sensor pin
+  // Serial.println(analogRead(SENSOR_PIN));
+  // Serial.println((5.0 * analogRead(SENSOR_PIN) / 1023.0 - 0.5) * 37.5);
+
+  // Pressure valve tuning-=
   if (TUNE_PRESSURE) { 
     tuneValve(PRESSURE_PIN);
     setLCD(F("Pressure Valve"), F("Tuning Complete"));

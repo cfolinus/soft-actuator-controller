@@ -26,7 +26,7 @@ const int ANALOG_VENT_MAX = 180;
    file with lowest available integer appended to the end, so as to not overwrite 
    existing data files on the SD card */
 
-const char fileName[] = "long_cycle_test";
+const char fileName[] = "250828_setup";
 
 // ========== Tuning Modes ==========
 /* Toggles for the initial tuning processes for the pressure and vent solenoid valves,
@@ -45,7 +45,7 @@ const bool TUNE_VENT = false;
 const bool USE_SD_CARD = false;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 30; // units depend on value of USE_KPA
+const int OVERPRESSURE_LIMIT = 25; // units depend on value of USE_KPA
 const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
@@ -53,7 +53,7 @@ const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 values lets you control the time delay, in milliseconds, between each occurrence 
 of the corresponding action in the system. */
 
-const double PRESSURE_READ_DELAY = 15; // milliseconds
+const double PRESSURE_READ_DELAY = 30; // milliseconds
 const int INTERP_CALC_DELAY = 30;      // milliseconds
 const int CONTROLLER_DELAY = 30;       // milliseconds 
 
@@ -65,7 +65,7 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
 const double THRESHOLD = 3;
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
-const double KP = 0.01;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
+const double KP = 0.1;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
 const double KI = 0.000001;
 const double KD = 0.0;
 
@@ -85,8 +85,8 @@ const double KD = 0.0;
 */
 
 // Step Function Trajectory
-const float TIMES[] = {0, 100, 2000, 2100, 3000}; // milliseconds
-const double PRESSURES[] = {0, 15, 15, 0, 0};    // PSI or Kpa
+const float TIMES[] = {0, 100, 2000, 2100, 4000}; // milliseconds
+const double PRESSURES[] = {0, 20, 20, 0, 0};    // PSI or Kpa
 
 // Uncomment to use a different trajectory:
 
