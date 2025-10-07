@@ -1,3 +1,5 @@
+addpath(genpath('helper_functions'));
+
 % Get data file
 [data, filename] = getDataFile();
 if isempty(data)

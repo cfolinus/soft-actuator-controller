@@ -2,7 +2,7 @@
 close all; clear; clc;
 
 % Adjust if necessary
-addpath(genpath('helper functions'));
+addpath(genpath('helper_functions'));
 
 % Initialize Serial Communication
 % Change to match the serial port on your comptuer

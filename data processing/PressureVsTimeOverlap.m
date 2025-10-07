@@ -1,6 +1,6 @@
 clear; close all;
 % Adjust as necessary
-addpath(genpath('helper functions'));
+addpath(genpath('helper_functions'));
 
 % Toggle for applying the digital low-pass filter for visibility
 applyFilter = true; % Set to true to apply the filter, false to skip it

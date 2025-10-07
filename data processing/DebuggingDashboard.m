@@ -1,6 +1,6 @@
 clear; close all;
 % Adjust as necessary
-addpath(genpath('helper functions'));
+addpath(genpath('helper_functions'));
 
 % Call the helper function to get data, file name, and Kp/Ki values
 [data, fileName, Kp, Ki] = getDataFile();
