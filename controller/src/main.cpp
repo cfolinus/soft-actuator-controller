@@ -54,39 +54,65 @@ void setup() {
   pinMode(STOP_BUTTON_PIN, INPUT_PULLUP);
 
   // vent any air in the system
-  closeValves();
-  delay(20); // 20 millisecond delay between signal and mechanical valve response
+openVentValve();
+delay(1000);
 
-  // TODO TROUBLESHOOT VENTING
-  closePressureValve();
-  setLCD(F("Venting..."), F("Please wait"));
-  Serial.println("NEW RUN");
-  Serial.println("Venting");
-  Serial.println(analogRead(SENSOR_PIN));
-  openVentValve();
-  delay(5000); // hold for 5 seconds to fully vent
-  Serial.println(analogRead(SENSOR_PIN));
-  closeValves();  
+closeValves();
+delay(20); // 20 millisecond delay between signal and mechanical valve response
+
+  // openVentValve();
+
+  // openPressureValve();
+  // delay(1000);
+  // closeValves();
+  // delay(1000);
+
+  // openVentValve();
+  // delay(1000);
+  // closeValves();
 
 
-  delay(5000);
+  // // TODO TROUBLESHOOT VENTING
+  setLCD("Initializing...", "");
+  Serial.println("Initializing...");
+  // Serial.println(digitalRead(START_BUTTON_PIN));
+  // Serial.println(digitalRead(STOP_BUTTON_PIN));
+  // closePressureValve();
+  // setLCD(F("Venting..."), F("Please wait"));
+  // Serial.println("NEW RUN");
 
-  // TODO TROUBLESHOOT PRESSURIZING
-  closeVentValve();
-  setLCD(F("Pressurizing..."), F("Please wait"));
-  Serial.println("Pressurizing");
-  Serial.println(analogRead(SENSOR_PIN));
-  openPressureValve();
-  delay(5000); // hold for 5 seconds to fully pressurize
-  Serial.println(analogRead(SENSOR_PIN));
+  // Serial.println("Venting");
+  // Serial.println(analogRead(SENSOR_PIN));
+  // openVentValve();
+  // delay(5000); // hold for 5 seconds to fully vent
+  // Serial.println(analogRead(SENSOR_PIN));
+  // closeValves();  
 
-  closePressureValve();
-  Serial.println("Venting");
-  Serial.println(analogRead(SENSOR_PIN));
-  openVentValve();
-  delay(5000); // hold for 5 seconds to fully vent
-  Serial.println(analogRead(SENSOR_PIN));
-  closeValves();  
+
+  // delay(5000);
+
+  // // // TODO TROUBLESHOOT PRESSURIZING
+  // closeVentValve();
+  // setLCD(F("Pressurizing..."), F("Please wait"));
+  // Serial.println("Pressurizing");
+  // Serial.println(analogRead(SENSOR_PIN));
+  // openPressureValve();
+  // delay(5000); // hold for 5 seconds to fully pressurize
+  // Serial.println(analogRead(SENSOR_PIN));
+
+  // closePressureValve();
+  // openVentValve();
+  // delay(1000);
+  // closeValves();
+  // delay(50);
+
+  // closePressureValve();
+  // Serial.println("Venting");
+  // Serial.println(analogRead(SENSOR_PIN));
+  // openVentValve();
+  // delay(5000); // hold for 5 seconds to fully vent
+  // Serial.println(analogRead(SENSOR_PIN));
+  // closeValves();  
 
   // Serial.println("Venting");
   // closePressureValve();
@@ -129,7 +155,7 @@ void setup() {
       Serial.print(F("KD,")); Serial.println(KD, 5);
       Serial.print(F("Traj Follow Error Threshold,")); Serial.println(THRESHOLD);
       Serial.print(F("Filter alpha,")); Serial.println(FILTER_ALPHA, 5);
-      Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5);
+      Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5); 
       Serial.print(F("Pressure Read Delay,")); Serial.println(PRESSURE_READ_DELAY);
       Serial.print(F("Interpolation Calculation Delay,")); Serial.println(INTERP_CALC_DELAY);
       Serial.print(F("Controller Delay,")); Serial.println(CONTROLLER_DELAY);
@@ -167,6 +193,7 @@ void setup() {
 
 void loop() {
   // Get current time
+  // Serial.println("START LOOP");
   unsigned long currentMillis = millis();
   // Stop operations if stop button is pressed
   if (digitalRead(STOP_BUTTON_PIN) == LOW){
