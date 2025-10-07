@@ -42,7 +42,7 @@ const char fileName[] = "251007_setup";
    for the pressure valve, and 'TUNE_VENT' to 'true' to enable tuning mode for the vent valve. 
    Set both to 'false' for normal PID controller operation. */
 
-const bool TUNE_PRESSURE = false;
+const bool TUNE_PRESSURE = true;
 const bool TUNE_VENT = false;
 
 // ========== Pressure Sensor Settings ==========
@@ -50,10 +50,10 @@ const bool TUNE_VENT = false;
    Adjust the filter alpha value and maximum pressure according to your sensor's specifications.
    Toggle where you want to use kPa (true) or PSI (false) depending on your application/preference */
 
-const bool USE_SD_CARD = true;
-const bool USE_KPA = true; 
+const bool USE_SD_CARD = false;
+const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 50; // units depend on value of USE_KPA
+const int OVERPRESSURE_LIMIT = 10; // units depend on value of USE_KPA
 const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
@@ -61,7 +61,7 @@ const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 values lets you control the time delay, in milliseconds, between each occurrence 
 of the corresponding action in the system. */
 
-const double PRESSURE_READ_DELAY = 30; // milliseconds
+const double PRESSURE_READ_DELAY = 15; // milliseconds
 const int INTERP_CALC_DELAY = 30;      // milliseconds
 const int CONTROLLER_DELAY = 30;       // milliseconds 
 
@@ -70,11 +70,11 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
    Fine-tune the proportional (KP), integral (KI), and derivative (KD) 
    constants for optimal performance. */
 
-const double THRESHOLD = 10;
+const double THRESHOLD = 2.9;
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
-const double KP = 0.1;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
-const double KI = 0.00005;
+const double KP = 0.675;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
+const double KI = 2.11;
 const double KD = 0.0;
 
 // ========== Trajectory Settings ==========
@@ -93,18 +93,22 @@ const double KD = 0.0;
 */
 
 // Step Function Trajectory
-const float TIMES[] = {0, 1000, 2000, 3000, 4000}; // milliseconds
-const double PRESSURES[] = {0, 20, 20, 0, 0};    // PSI or Kpa
+// const float TIMES[] = {0, 100, 20000, 20100, 21000}; // milliseconds
+// const double PRESSURES[] = {0, 5.8, 5.8, 0, 0};    // PSI or Kpa
+
+
+// const float TIMES[] = {0, 100, 2000, 2100, 4000}; // milliseconds
+// const double PRESSURES[] = {0, 5.8, 5.8, 0, 0};    // PSI or Kpa
 
 // Uncomment to use a different trajectory:
 
 // Triangle Trajectory
-// const float TIMES[] = {0, 1500, 1600, 3000, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 20, 20, 0, 0}; // PSI or Kpa
+const float TIMES[] = {0, 1500, 1600, 3000, 3500}; // milliseconds
+const double PRESSURES[] = {0, 5.8, 5.8, 0, 0}; // PSI or Kpa
 
 //Sawtooth Trajectory
 // const float TIMES[] = {0, 3000, 3100, 3200, 3500}; // milliseconds
-// const double PRESSURES[] = {0, 20, 20, 0, 0};    // PSI or Kpa
+// const double PRESSURES[] = {0, 5.8, 5.8, 0, 0};    // PSI or Kpa
 
 // Reverse Sawtooth Trajectory
 // const float TIMES[] = {0, 100, 200, 3100, 3500}; // milliseconds

@@ -20,4 +20,5 @@ receiveAndPlotData(s, csvFileName, pressurePlot, controlSignalPlot, ...
     errorPlot, integralPlot, kpErrorPlot, kiIntegralPlot, ...
     kpValue, kiValue, kdValue, useKPa);
 
-
+% 
+active_ports = serialportfind; delete(active_ports);
