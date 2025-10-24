@@ -24,17 +24,17 @@ const int VENT_PIN = 5;
 // ========== Pneumatic Valve Settings ==========
 /* Control the pressure applied by the pneumatic valves.
    Adjust the min and max analog PWM write values to calibrate the pressure range. */
-const int ANALOG_PRESSURE_MIN = 146;
-const int ANALOG_PRESSURE_MAX = 170;
-const int ANALOG_VENT_MIN = 156;
-const int ANALOG_VENT_MAX = 180;
+const int ANALOG_PRESSURE_MIN = 157;
+const int ANALOG_PRESSURE_MAX = 182;
+const int ANALOG_VENT_MIN = 164;
+const int ANALOG_VENT_MAX = 189;
 
 // ========== Filename Settings ==========
 /* String for name of file series. Controller will automatically generate csv
    file with lowest available integer appended to the end, so as to not overwrite 
    existing data files on the SD card */
 
-const char fileName[] = "251007_setup";
+const char fileName[] = "251023_cycle";
 
 // ========== Tuning Modes ==========
 /* Toggles for the initial tuning processes for the pressure and vent solenoid valves,
@@ -42,7 +42,7 @@ const char fileName[] = "251007_setup";
    for the pressure valve, and 'TUNE_VENT' to 'true' to enable tuning mode for the vent valve. 
    Set both to 'false' for normal PID controller operation. */
 
-const bool TUNE_PRESSURE = true;
+const bool TUNE_PRESSURE = false;
 const bool TUNE_VENT = false;
 
 // ========== Pressure Sensor Settings ==========
@@ -50,7 +50,7 @@ const bool TUNE_VENT = false;
    Adjust the filter alpha value and maximum pressure according to your sensor's specifications.
    Toggle where you want to use kPa (true) or PSI (false) depending on your application/preference */
 
-const bool USE_SD_CARD = false;
+const bool USE_SD_CARD = true;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
 const int OVERPRESSURE_LIMIT = 10; // units depend on value of USE_KPA
@@ -61,7 +61,7 @@ const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 values lets you control the time delay, in milliseconds, between each occurrence 
 of the corresponding action in the system. */
 
-const double PRESSURE_READ_DELAY = 15; // milliseconds
+const double PRESSURE_READ_DELAY = 30; // milliseconds
 const int INTERP_CALC_DELAY = 30;      // milliseconds
 const int CONTROLLER_DELAY = 30;       // milliseconds 
 
@@ -70,11 +70,11 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
    Fine-tune the proportional (KP), integral (KI), and derivative (KD) 
    constants for optimal performance. */
 
-const double THRESHOLD = 2.9;
+const double THRESHOLD = 3.6;
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
-const double KP = 0.675;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
-const double KI = 2.11;
+const double KP = 0.72;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
+const double KI = 3.38;
 const double KD = 0.0;
 
 // ========== Trajectory Settings ==========
@@ -93,8 +93,8 @@ const double KD = 0.0;
 */
 
 // Step Function Trajectory
-// const float TIMES[] = {0, 100, 20000, 20100, 21000}; // milliseconds
-// const double PRESSURES[] = {0, 5.8, 5.8, 0, 0};    // PSI or Kpa
+const float TIMES[] = {0, 100, 1500, 1600, 3000}; // milliseconds
+const double PRESSURES[] = {0, 7.2, 7.2, 0, 0};   // PSI or Kpa
 
 
 // const float TIMES[] = {0, 100, 2000, 2100, 4000}; // milliseconds
@@ -103,8 +103,10 @@ const double KD = 0.0;
 // Uncomment to use a different trajectory:
 
 // Triangle Trajectory
-const float TIMES[] = {0, 1500, 1600, 3000, 3500}; // milliseconds
-const double PRESSURES[] = {0, 5.8, 5.8, 0, 0}; // PSI or Kpa
+// const float TIMES[] = {0, 2000, 4000}; // milliseconds
+// const double PRESSURES[] = {0, 7.2, 0}; // PSI or Kpa
+// const float TIMES[] = {0, 1000, 2000, 3000, 4000}; // milliseconds
+// const double PRESSURES[] = {0, 5.8, 5.8, 0, 0}; // PSI or Kpa
 
 //Sawtooth Trajectory
 // const float TIMES[] = {0, 3000, 3100, 3200, 3500}; // milliseconds

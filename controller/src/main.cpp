@@ -207,6 +207,8 @@ void loop() {
 
   // Pressure valve tuning-=
   if (TUNE_PRESSURE) { 
+    Serial.println("TUNING PRESSURE VALVE");
+    
     tuneValve(PRESSURE_PIN);
     setLCD(F("Pressure Valve"), F("Tuning Complete"));
     exit(0);
