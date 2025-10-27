@@ -1,0 +1,16 @@
+Settings:
+filename,251023_cycle_8.csv
+Use KPA?,0
+KP,0.72000
+KI,3.38000
+KD,0.00000
+Traj Follow Error Threshold,3.60
+Filter alpha,0.00000
+Sensor offset,0.11000
+Pressure Read Delay,30.00
+Interpolation Calculation Delay,30
+Controller Delay,30
+Traj times,0.00,100.00,1500.00,1600.00,3000.00
+Traj pressures,0.00,7.20,7.20,0.00,0.00
+Data:
+time,pressure,error,integral,cycle_start

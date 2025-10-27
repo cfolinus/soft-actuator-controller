@@ -53,7 +53,7 @@ const bool TUNE_VENT = false;
 const bool USE_SD_CARD = true;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 10; // units depend on value of USE_KPA
+const int OVERPRESSURE_LIMIT = 17.4; // units depend on value of USE_KPA
 const double SENSOR_OFFSET = 0.11; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
@@ -70,7 +70,7 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
    Fine-tune the proportional (KP), integral (KI), and derivative (KD) 
    constants for optimal performance. */
 
-const double THRESHOLD = 3.6;
+const double THRESHOLD = 4.35;
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
 const double KP = 0.72;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
@@ -94,7 +94,7 @@ const double KD = 0.0;
 
 // Step Function Trajectory
 const float TIMES[] = {0, 100, 1500, 1600, 3000}; // milliseconds
-const double PRESSURES[] = {0, 7.2, 7.2, 0, 0};   // PSI or Kpa
+const double PRESSURES[] = {0, 8.7, 8.7, 0, 0};   // PSI or Kpa
 
 
 // const float TIMES[] = {0, 100, 2000, 2100, 4000}; // milliseconds
