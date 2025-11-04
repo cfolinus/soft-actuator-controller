@@ -1,9 +1,16 @@
 clear; close all;
 addpath(genpath('helper_functions'));
 
-csv_filepath = fullfile('data', 'cycles', '251023_cycle_1.csv');
+% csv_filepath = fullfile('data', 'cycles', '251023_cycle_0.csv');
+csv_filepath = fullfile('data', 'cycles', ...
+                        'Green', ...
+                        'cycle_specimen46_trial1.csv');
 
+units.psi_to_kPa = 6.89476;
+units.kPa_to_psi = 1 / 6.89476;
 
+alpha_confidence = 0.05;
+colors.blue = [0, 128, 203]/255;
 
 %% Extract controller settings
 % Open the file and read its contents
@@ -33,7 +40,7 @@ while not(feof(file_id))
         case 'filename'
             controller_params.filename = temp_setting_value;
         case 'Use KPA?'
-            controller_params.use_kPa = temp_setting_value;
+            controller_params.use_kPa = str2double(temp_setting_value);
         case 'KP'
             controller_params.gain_proportional = temp_setting_value;
         case 'KI'
@@ -57,6 +64,7 @@ while not(feof(file_id))
             controller_params.trajectory_time_ms = 1e-3 * str2double(temp_line(2:end));
         case 'Traj pressures'
             controller_params.trajectory_pressure = str2double(temp_line(2:end));
+        case 'Settings:'
         case 'Data:'
             break
         otherwise
@@ -66,6 +74,12 @@ end
 
 fclose(file_id);
 clear temp_line temp_setting_name temp_setting_value
+
+if controller_params.use_kPa
+    controller_params.trajectory_pressure_kPa = controller_params.trajectory_pressure;
+else
+    controller_params.trajectory_pressure_kPa = controller_params.trajectory_pressure * units.psi_to_kPa;
+end
 
 
 
@@ -80,12 +94,14 @@ clear opts
 
 %% Split data into cycles and resample
 num_time_points = 100;
+resampled_time_ms = linspace(0, controller_params.trajectory_time_ms(end), num_time_points);
 
 end_indices = find(raw_data.cycle_start);
 num_raw_cycles = numel(end_indices);
 
 % Initialize cell arrays to store cycles data
 raw_cycle_data = cell([num_raw_cycles, 1]);
+resampled_cycle_data = cell([num_raw_cycles, 1]);
 
 % Extract and store each cycle's data
 for cycle_index = 1:num_raw_cycles
@@ -101,153 +117,282 @@ for cycle_index = 1:num_raw_cycles
     temp_cycle_indices = temp_start_index:temp_end_index;
 
     % Extract data for this cycle
-    raw_cycle_data{cycle_index} = raw_data(temp_start_index:temp_end_index, :);
+    temp_cycle_data = raw_data(temp_start_index:temp_end_index, :);
 
     % Shift time to start at zero
-    raw_cycle_data{cycle_index}.time = ...
-        raw_cycle_data{cycle_index}.time - raw_cycle_data{cycle_index}.time(1);
+    temp_cycle_data.time = ...
+        temp_cycle_data.time - temp_cycle_data.time(1);
+
+
 
     % Convert time in ms to seconds
-    raw_cycle_data{cycle_index}.time_ms = 1e-3 * raw_cycle_data{cycle_index}.time;
-    raw_cycle_data{cycle_index} = removevars(raw_cycle_data{cycle_index}, 'time');
+    temp_cycle_data.time_ms = 1e-3 * temp_cycle_data.time;
+    temp_cycle_data = movevars(temp_cycle_data, 'time_ms', 'Before', 'time');
+    temp_cycle_data = removevars(temp_cycle_data, 'time');
 
 
-    % Resample cycle data to have consistent number of points
+
+
+    % Convert pressure to kPa
+    % If data was collected in kPa, just update variable name
+    if controller_params.use_kPa
+        temp_cycle_data.pressure_kPa = temp_cycle_data.pressure;
     
+    % If data was collected in psi, convert data and update variable name
+    else
+        temp_cycle_data.pressure_kPa = temp_cycle_data.pressure * units.psi_to_kPa;
+
+        temp_cycle_data.error = temp_cycle_data.error * units.psi_to_kPa;
+        temp_cycle_data.integral = temp_cycle_data.integral * units.psi_to_kPa;
+
+    end
+    temp_cycle_data = movevars(temp_cycle_data, 'pressure_kPa', 'Before', 'pressure');
+    temp_cycle_data = removevars(temp_cycle_data, 'pressure');
+
+    
+
+    % Store raw cycle data
+    raw_cycle_data{cycle_index} = temp_cycle_data;
+
+
+
+    % % Resample cycle data to have consistent number of points
+    % temp_resampled_pressure_kPa = interp1(temp_cycle_data.time_ms, ...
+    %                                             temp_cycle_data.pressure_kPa, ...
+    %                                             resampled_time_ms, ...
+    %                                             'linear', ...
+    %                                             'extrap');
+    % resampled_cycle_data{cycle_index}.time_ms = resampled_time_ms';
+    % resampled_cycle_data{cycle_index}.pressure_kPa = temp_resampled_pressure_kPa';
+
 end
 
 
 
-
-
-%% Pre-process data
-% Assumes time in column 1, pressure in column 2, cycle completion in column 5
-time = cycle_data.time / 1000; % Convert from milliseconds to seconds
-pressure = cycle_data.pressure;
-pressure = pressure * 6.89476; % convert fromn psi to KPA
-cycle_complete = cycle_data.cycle_start; % New column indicating the completion of a cycle
-
-% % Apply digital low-pass filter if toggle is on
-% if applyFilter
-%     [b, a] = butter(filterOrder, cutoffFrequency, 'low');
-%     pressure = filtfilt(b, a, pressure);
-% end
-
-% Identify end indices of each cycle based on the cycle_complete column
-end_indices = find(cycle_complete == 1);
-
-% Initialize cell arrays to store cycles data
-cycles = {};
-
-% Extract and store each cycle's data
-temp_start_index = 1;
-for cycle_index = 1:length(end_indices)
-    temp_end_index = end_indices(cycle_index);
-    cycle_indices = temp_start_index:temp_end_index;
-
-    % Normalize time to start at zero
-    cycles{cycle_index}.time = time(cycle_indices) - time(cycle_indices(1)); 
-    cycles{cycle_index}.pressure = pressure(cycle_indices);
-    temp_start_index = temp_end_index + 1; 
-end
 
 %% Manually check for end conditions
-pressure_threshold = 25;
+pressure_threshold_kPa = 0.5 * max(controller_params.trajectory_pressure_kPa);
 
-for cycle_index = 1:length(cycles)
-    max_cycle_pressure(cycle_index) = max(cycles{cycle_index}.pressure);
+
+max_cycle_pressure_kPa = nan([num_raw_cycles, 1]);
+for cycle_index = 1:num_raw_cycles
+    max_cycle_pressure_kPa(cycle_index) = max(raw_cycle_data{cycle_index}.pressure_kPa);
 end
 
-temp_flagged_cycles = find(max_cycle_pressure < pressure_threshold, 1);
+temp_flagged_cycle = find(max_cycle_pressure_kPa < pressure_threshold_kPa, 1);
+
+if not(isempty(temp_flagged_cycle))
+    temp_final_cycle = temp_flagged_cycle - 1;
+else
+    temp_final_cycle = height(raw_cycle_data);
+end
+
 
 % Trim cycles
-cycles = cycles(1:temp_flagged_cycles);
+raw_cycle_data = raw_cycle_data(1:temp_final_cycle);
 
+for cycle_index = 1:temp_final_cycle
 
-%% Resample pressure data
-% Find the maximum cycle duration to establish a common time vector
-max_cycle_time = max(cellfun(@(x) max(x.time), cycles));
-normalized_time = linspace(0, max_cycle_time, 100); % Interpolating with 1000 points
+    temp_cycle_data = raw_cycle_data{cycle_index, 1};
 
-% Interpolate pressure data for each cycle to match the normalized time axis
-interpolated_pressures = zeros(length(cycles), length(normalized_time));
-
-for cycle_index = 1:length(cycles)
-    interpolated_pressures(cycle_index, :) = interp1(cycles{cycle_index}.time, ...
-                                                cycles{cycle_index}.pressure, ...
-                                                normalized_time, ...
+    % Resample cycle data to have consistent number of points
+    temp_resampled_pressure_kPa = interp1(temp_cycle_data.time_ms, ...
+                                                temp_cycle_data.pressure_kPa, ...
+                                                resampled_time_ms, ...
                                                 'linear', ...
                                                 'extrap');
+    resampled_cycle_data{cycle_index}.time_ms = resampled_time_ms';
+    resampled_cycle_data{cycle_index}.pressure_kPa = temp_resampled_pressure_kPa';
 end
 
-% Calculate the mean and standard deviation at each time point
-mean_pressure = mean(interpolated_pressures, 1);
-std_pressure = std(interpolated_pressures, 0, 1);
+% resampled_cycle_data = resampled_cycle_data(1:temp_final_cycle);
 
-% Calculate the 95% confidence interval using the t-distribution
-n = size(interpolated_pressures, 1); % Number of cycles
-df = n - 1;  % Degrees of freedom
-t_critical = tinv(0.975, df); % t critical value for a 95% confidence level
-
-% Confidence interval calculation with t-distribution
-conf_interval = t_critical * (std_pressure / sqrt(n));
+% Convert resampled data to struct
+resampled_cycle_data = [resampled_cycle_data{:}];
 
 
 
-%% Plot data
-figure; hold on;
-plot (cycle_data.time, cycle_data.pressure);
+%% Calculate mean, variance, etc.
+overall_cycle_data.time_ms = resampled_time_ms';
 
-num_cycle_starts = nnz(cycle_data.cycle_start);
+temp_pressure_kPa = [resampled_cycle_data(:).pressure_kPa];
+
+overall_cycle_data.mean_pressure_kPa = mean(temp_pressure_kPa, 2);
+overall_cycle_data.std_pressure_kPa = std(temp_pressure_kPa, [], 2);
+
+temp_num_cycles = numel(resampled_cycle_data);
+t_critical = tinv(1 - 0.5 * alpha_confidence, temp_num_cycles - 1);
+overall_cycle_data.conf_interval_pressure_kPa = ...
+    t_critical * (overall_cycle_data.std_pressure_kPa / sqrt(temp_num_cycles));
 
 
 
-%% Plot the mean pressure with the 95% confidence interval as a shaded area
+
+%% Plot data from this file
+% plotAverageAndConfidence (overall_cycle_data, controller_params)
+% 
+% plotOverlaidCycles(resampled_cycle_data, controller_params, plot_frequency);
+% plotIndividualCycles(resampled_cycle_data, controller_params, plot_frequency);
+plot_frequency = 50;
+
+
 figure;
-hold on;
+t = tiledlayout(2, 2, 'TileSpacing', 'compact');
+nexttile();
+plotAverageAndConfidence (overall_cycle_data, controller_params)
 
-% Select trajectory [period and magnitude adjustable in function def]
-% 1 for step
-% 2 for triangle
-% 3 for sawtooth
-% 4 for reverse sawtooth
-% 5 for sine wave
-% 6 for burst ramp
-trajSelect = 1;
-magnitude = 50; % unitless for purposes of graphing
-[trajTimes, trajPressures] = getTrajectory(trajSelect, magnitude);
+nexttile();
+plotOverlaidCycles(resampled_cycle_data, controller_params, plot_frequency);
 
-darkGreen = [0, 0.8, 0];
+nexttile(t, 3, [1, 2]);
+plotIndividualCycles(resampled_cycle_data, controller_params, plot_frequency)
 
-% Plot the mean pressure line
-plot(normalized_time, mean_pressure, 'Color', 'r', 'LineWidth', 6);
-%plot(normalized_time, mean_pressure, 'b', 'LineWidth', 6);
+% Adjust figure size (double-width)
+set(gcf, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
+        [100 100 4*300 3*300]);
 
-% Plot the shaded area for the confidence interval
-fill([normalized_time, fliplr(normalized_time)], ...
-    [mean_pressure - conf_interval, fliplr(mean_pressure + conf_interval)], ...
-    'r', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
 
-plot(trajTimes, trajPressures, 'k--', 'LineWidth', 3);
+function plotAverageAndConfidence (overall_cycle_data, controller_params)
 
-% Remove padding around the plot
-axis tight; % Ensures axes are tightly fitted to the data
-set(gca, 'LooseInset', max(get(gca, 'TightInset'), 0.02)); % Removes extra padding
+    hold on;
+    
+    x_data = overall_cycle_data.time_ms';
+    y_data = overall_cycle_data.mean_pressure_kPa';
+    error_data = overall_cycle_data.conf_interval_pressure_kPa';
+    
+    plot (x_data, y_data, ...
+        'Color', 0 * ones(1,3), ...
+        'LineWidth', 2);
+    
+    % Plot the shaded area for the confidence interval
+    fill([x_data, fliplr(x_data)], ...
+        [y_data - error_data, fliplr(y_data + error_data)], ...
+        'r', ...
+        'FaceColor', 0 * ones(1,3), ...
+        'FaceAlpha', 0.25, ...
+        'EdgeColor', 'none');
+    
+    % Plot programmed trajectory
+    plot(controller_params.trajectory_time_ms, ...
+        controller_params.trajectory_pressure_kPa, 'k--', 'LineWidth', 2);
+    
+    
+    
+    % Format graph
+    % Remove padding around the plot
+    axis tight; % Ensures axes are tightly fitted to the data
+    % set(gca, 'LooseInset', max(get(gca, 'TightInset'), 0.02)); % Removes extra padding
+    
+    % Improve plot appearance
+    ylim([0, inf])
+    xlim([0, inf])
+    grid on;
+    hold off;
+    improvePlot();
+    
+    % Set the font size for tick marks
+    % set(gca, 'FontSize', 24); 
+    
+    % Add labels and title
+    xlabel('Time (s)', 'FontWeight', 'Bold');
+    ylabel('Pressure (kPa)', 'FontWeight', 'Bold');
+    
+    % Set legend
+    % legend('Mean pressure', '95% confidence interval', 'Programmed trajectory');
 
-% Improve plot appearance
-ylim([0,inf])
-xlim([0,inf])
-grid on;
-hold off;
-improvePlot();
+end
 
-% Set the font size for tick marks
-set(gca, 'FontSize', 24); 
+function plotOverlaidCycles(resampled_cycle_data, controller_params, plot_frequency)
 
-% Add labels and title
-xlabel('Time (s)', 'FontSize', 32, 'FontWeight', 'Bold');
-ylabel('Pressure (kPa)', 'FontSize', 32, 'FontWeight', 'Bold');
+    hold on;
+    
+    num_total_cycles = numel(resampled_cycle_data);
+    cycles_to_plot = unique([1, plot_frequency:plot_frequency:num_total_cycles, num_total_cycles]);
+    
+    x_data = [resampled_cycle_data(cycles_to_plot).time_ms]';
+    y_data = [resampled_cycle_data(cycles_to_plot).pressure_kPa]';
+    color_data = linspace(0, 0.8, numel(cycles_to_plot))' * ones(1,3);
+    
+    for temp_index = 1:numel(cycles_to_plot)
+    
+        plot (x_data(temp_index, :), ...
+            y_data(temp_index, :), ...
+            'Color', color_data(temp_index, :), ...
+            'LineWidth', 2);
+    
+    end
+    
+    % % Plot programmed trajectory
+    % plot(controller_params.trajectory_time_ms, ...
+    %     controller_params.trajectory_pressure_kPa, 'k--', 'LineWidth', 2);
+    
+    
+    
+    % Format graph
+    % Remove padding around the plot
+    axis tight; % Ensures axes are tightly fitted to the data
+    % set(gca, 'LooseInset', max(get(gca, 'TightInset'), 0.02)); % Removes extra padding
+    
+    % Improve plot appearance
+    ylim([0, inf])
+    xlim([0, inf])
+    grid on;
+    hold off;
+    improvePlot();
+    
+    % Set the font size for tick marks
+    % set(gca, 'FontSize', 24); 
+    
+    % Add labels and title
+    xlabel('Time (s)', 'FontWeight', 'Bold');
+    ylabel('Pressure (kPa)', 'FontWeight', 'Bold');
+    
+end
+function plotIndividualCycles(resampled_cycle_data, controller_params, plot_frequency)
 
-% Set legend
-legend('Mean Pressure', '95% Confidence Interval', 'Ideal Trajectory', ...
-    'FontSize', 28);
+    hold on;
+    
+    num_total_cycles = numel(resampled_cycle_data);
+    cycles_to_plot = unique([1, plot_frequency:plot_frequency:num_total_cycles, num_total_cycles]);
+    
+    x_data = [resampled_cycle_data(cycles_to_plot).time_ms]' / max(controller_params.trajectory_time_ms);
+    y_data = [resampled_cycle_data(cycles_to_plot).pressure_kPa]';
+    color_data = linspace(0, 0.8, numel(cycles_to_plot))' * ones(1,3);
+    
+    for temp_index = 1:numel(cycles_to_plot)
+    
+        plot (x_data(temp_index, :) + temp_index, ...
+            y_data(temp_index, :), ...
+            'Color', color_data(temp_index, :), ...
+            'LineWidth', 2);
+    
+    end
+    
+    xtick_frequency = 5;
+    xticks([1, 2:xtick_frequency:numel(cycles_to_plot)])
+    xticklabels([1, cycles_to_plot(2:xtick_frequency:numel(cycles_to_plot))]);
+    
+    
+    
+    % Format graph
+    % Remove padding around the plot
+    axis tight; % Ensures axes are tightly fitted to the data
+    
+    % Improve plot appearance
+    ylim([0, 75])
+    xlim([0, inf])
+    grid on;
+    hold off;
+    improvePlot();
+    
+    % Set the font size for tick marks
+    % set(gca, 'FontSize', 24); 
+    
+    % Add labels and title
+    xlabel('Cycle (-)', 'FontWeight', 'Bold');
+    ylabel('Pressure (kPa)', 'FontWeight', 'Bold');
+    % 
+    % % Adjust figure size (double-width)
+    % set(gcf, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
+    %         [100 100 2*4*200 3*200]);
+end

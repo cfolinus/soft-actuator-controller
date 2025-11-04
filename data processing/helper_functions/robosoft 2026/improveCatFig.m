@@ -1,29 +1,33 @@
-function [] = improvePlot()
+function [] = improveCatFig()
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Plot parameters
     % MATLAB treats mac and PC displays differently which can create
     % weird looking graphs. Here we handle system differences
 
     if ismac
-        plot_width_in_px = 1000;
-        plot_height_in_px = 1600;
-        marker_size=5;
-        marker_line_width=4;
-        box_thickness = 3;
-        axis_tick_font_size = 16;
-        axis_label_font_size = 20;
-        legend_font_size = 8;
+        plot_width_in_px = 800;
+        plot_height_in_px = 400;
+        marker_size=10;
+        marker_line_width=2;
+        box_thickness = 1;
+        axis_tick_font_size = 24;
+        axis_label_font_size = 24;
+        legend_font_size = 20;
         error_bar_cap_size = 15;
     else % (ispc || isunix)
-        plot_width_in_px = 600;
-        plot_height_in_px = 600;
-        marker_size=10;
-        marker_line_width=2.0;
-        box_thickness = 2;
-        axis_tick_font_size = 18;
-        axis_label_font_size = 18;
-        legend_font_size = 16;
-        error_bar_cap_size = 10;
+        %plot_width_in_px = 800; runs
+        %plot_height_in_px = 600;
+        %plot_width_in_px = 800; long bar
+        %plot_height_in_px = 400;
+        plot_width_in_px = 440;%800;
+        plot_height_in_px = 440/1.618;
+        marker_size=6;
+        marker_line_width=1.0;
+        box_thickness = 0.5;
+        axis_tick_font_size = 8.5;
+        axis_label_font_size = 9;
+        legend_font_size = 8.5;
+        error_bar_cap_size = 6;
     end
     
     marker_outline = 'matching'; % could be 'black' or 'matching'
@@ -37,7 +41,7 @@ function [] = improvePlot()
 
     % Make the figure bigger
     set(hFig, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
-        [100 100 plot_width_in_px plot_height_in_px]);
+        [0 0 plot_width_in_px plot_height_in_px]);
 
     % Grab the axes handle(s)
     axis_handles=findobj(hFig,'type','axe');
@@ -52,8 +56,8 @@ function [] = improvePlot()
         set(ax, 'Box', 'on');
 
         % Change font size for axis text labels
-        set(get(ax, 'XLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
-        set(get(ax, 'YLabel'),'FontSize', axis_label_font_size, 'FontWeight', 'Bold');
+        set(get(ax, 'XLabel'),'FontSize', axis_label_font_size);
+        set(get(ax, 'YLabel'),'FontSize', axis_label_font_size);
         
         try % try statement to avoid error with categorical axes
         ax.XRuler.Exponent = 0; % Remove exponential notation from the X axis
@@ -83,7 +87,7 @@ function [] = improvePlot()
                 set(LineH(i), 'LineWidth', marker_line_width)
             end
             % Change lines and markers if they exist on the plot
-            set(LineH(i),   'MarkerSize', marker_size, ...
+            set(LineH(i),  ...
                 'MarkerEdgeColor', marker_outline_color, ...
                 'MarkerFaceColor', this_line_color);
         end
@@ -103,7 +107,7 @@ function [] = improvePlot()
     h = get(hFig,'children');
     for k = 1:length(h)
         if strcmpi(get(h(k),'Tag'),'legend')
-            set(h(k), 'FontSize', legend_font_size, 'location', 'best');
+            set(h(k), 'FontSize', legend_font_size);
             break;
         end
     end
