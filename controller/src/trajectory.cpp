@@ -7,30 +7,47 @@ Trajectory::Trajectory(int size) : maxSize(size), currentSetPoint(0) {
     lastWithinThresholdTime = millis();
 }
 
+
+
 // Function to reset the currentSetPoint counting variable
 void Trajectory::reset() {
     currentSetPoint = 1;
     lastWithinThresholdTime = millis();
 }
 
+
+
 // Function to fill trajectory class instance with new data and precompute differences
-bool Trajectory::setTrajectoryPoints(const float* newTimes, const double* newPressures, int size) {
+bool Trajectory::setTrajectoryPoints(const float* newTimes,
+                                    const double* newPressures,
+                                    int size) {
     if (size > maxSize) {
         return false;
     }
 
     // Copy data into the class arrays and precompute differences
     for (int i = 0; i < size; ++i) {
+
         times[i] = newTimes[i];
         pressures[i] = newPressures[i];
+
         if (i > 0) {
-            timeDifferences[i - 1] = times[i] - times[i - 1];  // Precompute time differences
-            pressureDifferences[i - 1] = pressures[i] - pressures[i - 1]; // Precompute pressure differences
+
+            // Precompute time differences
+            timeDifferences[i - 1] = times[i] - times[i - 1];
+            
+            // Precompute pressure differences      
+            pressureDifferences[i - 1] = pressures[i] - pressures[i - 1];
         }
     }
+
+    // After setting trajectory, set timeout duration
     updateTimeoutDuration();
+    
     return true;
 }
+
+
 
 // Function to linearly interpolate between two points in the trajectory based on deltaT
 float Trajectory::interp(unsigned long deltaT) {
@@ -58,26 +75,47 @@ float Trajectory::interp(unsigned long deltaT) {
     return pressures[currentSetPoint - 1] + factor * pressureDifferences[currentSetPoint - 1];
 }
 
-// Function to check if the system is failing to follow the trajectory
-bool Trajectory::failingToFollow(double currentPressure, float deltaT, double threshold) {
-    unsigned long currentTime = millis();  // Cache millis() for efficiency
 
+
+// Function to check if the system is failing to follow the trajectory
+bool Trajectory::failingToFollow(double currentPressure, 
+                                    float deltaT,
+                                    double threshold) {
+
+    // Cache current time for efficiency
+    unsigned long currentTime = millis();
+
+    // Extract expected pressure
     double expectedPressure = pressures[currentSetPoint];
-    if (abs(expectedPressure - currentPressure) > threshold && expectedPressure != 0.0) {
+
+    // If pressure error is above threshold and expected pressure is nonzero
+    if (abs(expectedPressure - currentPressure) > threshold 
+        && expectedPressure != 0.0) {
+
+        // If we haven't been within threshold for beyond the timeout duration,
+        // declare a failure to follow trajectory
         if ((currentTime - lastWithinThresholdTime) > timeoutDuration) {
-            return true;  // Declare failure to follow trajectory
+            return true;
         }
-    } else {
-        lastWithinThresholdTime = currentTime;  // Update within-threshold time
+    }
+    
+    // If pressure error is currently in threshold, update within-threshold time
+    else {
+        lastWithinThresholdTime = currentTime;
     }
 
-    return false;  // Not failing
+    // Return not-failing signal
+    return false;
 }
+
+
 
 // Function to check if the trajectory is finished
 bool Trajectory::isFinished(unsigned long deltaT) const {
     return deltaT > times[maxSize - 1];
 }
+
+
 
 // Function to update the timeout duration based on the longest interval between points
 void Trajectory::updateTimeoutDuration() {
@@ -89,6 +127,8 @@ void Trajectory::updateTimeoutDuration() {
         }
     }
 }
+
+
 
 // Initialize the trajectory object
 bool InitializeTrajectory(Trajectory* traj, const float* times, const double* pressures, int size) {

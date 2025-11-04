@@ -221,47 +221,90 @@ void loop() {
   }
   // Normal operation
   else { 
+
+
     // Check that pressure does not exceed maximum
     if (SensorPressure > OVERPRESSURE_LIMIT) {
       vent();
       endTest(F("Overpressure"), totalCycles);
     }
+
+
+
     // Check that controller isn't failing to follow the trajectory
     if (traj.failingToFollow(SensorPressure, deltaT, THRESHOLD)) {
       endTest(F("Traj Follow Fail"), totalCycles);
     }
+
+
+
     // Check if cycle is complete
     if (cycleComplete) {
+      
+      // Update cycle count and LCD
       totalCycles++;
       setLCD(String(specificFileName), "Cycles: " + String(totalCycles));
-      valvePID.reset();  // anti-windup call
+
+      // Reset controller (anti-windup) and trajectory
+      valvePID.reset();
       traj.reset();
-      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete, currentMillis);
+
+      // Log and sync data
+      logData(SensorPressure,
+              valvePID.getPreviousError(),
+              valvePID.getIntegral(),
+              cycleComplete,
+              currentMillis);
       trajStartTime = millis();
       syncData();
+
+      // Update cycle status
       cycleComplete = false;
     }
+
+
+
     // Log data at (1/PRESSURE_READ_DELAY) Hz
     if ((currentMillis - lastPressureUpdate) > PRESSURE_READ_DELAY) {
+
+      // Measure pressure
       UpdateFilteredSensorPressure(USE_KPA);
-      logData(SensorPressure, valvePID.getPreviousError(), valvePID.getIntegral(), cycleComplete, currentMillis);
-      lastPressureUpdate = currentMillis;  // Reset pressure update timer
+
+      // Log data
+      logData(SensorPressure,
+              valvePID.getPreviousError(),
+              valvePID.getIntegral(),
+              cycleComplete,
+              currentMillis);
+
+      // Reset time since last pressure update
+      lastPressureUpdate = currentMillis;
     }
+
+  
+
     // Interpolate setpoint at (1/INTERP_CALC_DELAY) Hz
     if ((currentMillis - lastInterpUpdate) > INTERP_CALC_DELAY) {
+
       // Calculate time since start of trajectory cycle
       deltaT = currentMillis - trajStartTime; // COULD FUCK UP THE ENTIRE PROGRAM
-      // Check if trajectory is finished
+
+      // If trajectory is finished, update current pressure and cycle status
       if (traj.isFinished(deltaT)) {
         desiredPressure = PRESSURES[TRAJ_SIZE - 1];
         cycleComplete = true;
-      } else {
-        // If not, interpolate current setpoint
+      }
+      
+      // If trajectory isn't finished, interpolate current setpoint
+      else {
         desiredPressure = traj.interp(deltaT);
       }
-      // Reset interpolation timer
+
+      // Reset time since last setpoint interpolation update
       lastInterpUpdate = currentMillis;
     }
+
+
     // Run the PID control action
     valvePID.run();
     sendSignalToValves(output);
