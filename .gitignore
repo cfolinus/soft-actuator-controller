@@ -11,3 +11,5 @@ data processing/.DS_Store
 controller/.DS_Store
 *.asv
 data processing/data/cycles/_archive/cycle_combined_specimen00.mat
+data processing/data/cycles/_archive/cycle_specimen00_trial1.mat
+*.asv
