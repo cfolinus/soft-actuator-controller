@@ -37,10 +37,10 @@ colors.red = [204, 24, 0] / 255;
 
 % Define handle for figure formatting
 improveFig = @(plot_width_px, plot_height_px) improveHangerFig(plot_width_px, plot_height_px);
-% 
-% % Define units for conversions
-% units.psi_to_kPa = 6.89476;
-% units.kPa_to_psi = 1 / 6.89476;
+
+% Define units for conversions
+units.psi_to_kPa = 6.89476;
+units.kPa_to_psi = 1 / 6.89476;
 
 
 
@@ -112,6 +112,19 @@ if not(isempty(failed_cycle_index))
 else
     num_cycles = num_raw_cycles;
 end
+
+
+
+%% RUNOUT DETECTION
+% Check for screen runout condition: we start recording zero cycles
+cycle_start_screen_runout = find(isnan(mean_high_pressure_kPa), 1);
+
+% Look at raw data
+temp_runout_data = data.all_raw_cycle_data(cycle_start_screen_runout + (-1:5));
+temp_runout_data = cell2mat(temp_runout_data);
+
+pre_runout_data = data.all_raw_cycle_data(1:cycle_start_screen_runout);
+pre_runout_data = cell2mat(pre_runout_data);
 
 
 
