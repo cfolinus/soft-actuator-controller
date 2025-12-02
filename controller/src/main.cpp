@@ -265,7 +265,7 @@ void loop() {
 
 
     // Log data at (1/PRESSURE_READ_DELAY) Hz
-    if ((currentMillis - lastPressureUpdate) > PRESSURE_READ_DELAY) {
+    if ((currentMillis - lastPressureUpdate) >= PRESSURE_READ_DELAY) {
 
       // Measure pressure
       UpdateFilteredSensorPressure(USE_KPA);
@@ -284,7 +284,7 @@ void loop() {
   
 
     // Interpolate setpoint at (1/INTERP_CALC_DELAY) Hz
-    if ((currentMillis - lastInterpUpdate) > INTERP_CALC_DELAY) {
+    if ((currentMillis - lastInterpUpdate) >= INTERP_CALC_DELAY) {
 
       // Calculate time since start of trajectory cycle
       deltaT = currentMillis - trajStartTime; // COULD FUCK UP THE ENTIRE PROGRAM
