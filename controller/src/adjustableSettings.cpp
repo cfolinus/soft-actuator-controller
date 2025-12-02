@@ -6,8 +6,8 @@
    Adjust to your specific hardware set-up. Ensure PRESSURE_PIN and VENT_PIN are connected
    to PWM-capable pinouts on your microcontroller*/
 
-const int START_BUTTON_PIN = A3; 
-const int STOP_BUTTON_PIN = A2;
+const int START_BUTTON_PIN = A2; 
+const int STOP_BUTTON_PIN = A3;
 const int SENSOR_PIN = A7;
 const int PRESSURE_PIN = 6;
 const int VENT_PIN = 5;
@@ -34,7 +34,7 @@ const int ANALOG_VENT_MAX = 189;
    file with lowest available integer appended to the end, so as to not overwrite 
    existing data files on the SD card */
 
-const char fileName[] = "251023_cycle";
+const char fileName[] = "setup_cycle";
 
 // ========== Tuning Modes ==========
 /* Toggles for the initial tuning processes for the pressure and vent solenoid valves,
@@ -43,7 +43,7 @@ const char fileName[] = "251023_cycle";
    Set both to 'false' for normal PID controller operation. */
 
 const bool TUNE_PRESSURE = false;
-const bool TUNE_VENT = false;
+const bool TUNE_VENT = true;
 
 // ========== Pressure Sensor Settings ==========
 /* Settings related to pressure sensor calibration and data logging.

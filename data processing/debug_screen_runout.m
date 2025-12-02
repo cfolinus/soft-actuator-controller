@@ -14,10 +14,10 @@ fig_base_directory = fullfile('figures');
 enable_save_figs = false;
 
 % Name of actuator type, corresponding to subdirectory within directory_name
-actuator_type = 'Bare';
+actuator_type = 'Green';
 
 % Name of specific trial (.mat file) to be loaded
-trial_name = 'cycle_specimen16_trial1';
+trial_name = 'cycle_specimen36_trial1';
 
 % Relative threshold for determining actuator failure, based on assuming a
 % programmed rectangular wave. Tests fail when any of the following conditions
