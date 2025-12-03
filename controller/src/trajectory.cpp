@@ -3,7 +3,7 @@
 
 // Constructor to initialize the size of the arrays and the counter
 Trajectory::Trajectory(int size) : maxSize(size), currentSetPoint(0) {
-    timeoutDuration = 2000; // 2 seconds default
+    // timeoutDuration = 2000; // 2 seconds default
     lastWithinThresholdTime = millis();
 }
 
@@ -80,7 +80,8 @@ float Trajectory::interp(unsigned long deltaT) {
 // Function to check if the system is failing to follow the trajectory
 bool Trajectory::failingToFollow(double currentPressure, 
                                     float deltaT,
-                                    double threshold) {
+                                    double threshold,
+                                    double timeoutDuration) {
 
     // Cache current time for efficiency
     unsigned long currentTime = millis();

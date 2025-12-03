@@ -34,7 +34,7 @@ const int ANALOG_VENT_MAX = 189;
    file with lowest available integer appended to the end, so as to not overwrite 
    existing data files on the SD card */
 
-const char fileName[] = "setup_cycle";
+const char fileName[] = "tuning_test";
 
 // ========== Tuning Modes ==========
 /* Toggles for the initial tuning processes for the pressure and vent solenoid valves,
@@ -43,14 +43,14 @@ const char fileName[] = "setup_cycle";
    Set both to 'false' for normal PID controller operation. */
 
 const bool TUNE_PRESSURE = false;
-const bool TUNE_VENT = true;
+const bool TUNE_VENT = false;
 
 // ========== Pressure Sensor Settings ==========
 /* Settings related to pressure sensor calibration and data logging.
    Adjust the filter alpha value and maximum pressure according to your sensor's specifications.
    Toggle where you want to use kPa (true) or PSI (false) depending on your application/preference */
 
-const bool USE_SD_CARD = true;
+const bool USE_SD_CARD = false;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
 const int OVERPRESSURE_LIMIT = 17.4; // units depend on value of USE_KPA
@@ -70,7 +70,8 @@ const int CONTROLLER_DELAY = 30;       // milliseconds
    Fine-tune the proportional (KP), integral (KI), and derivative (KD) 
    constants for optimal performance. */
 
-const double THRESHOLD = 4.35;
+const double TRAJ_FAIL_PRESSURE = 4.35;
+const double TRAJ_FAIL_TIME = 1500; // timeout duration in milliseconds
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
 const double KP = 0.72;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning

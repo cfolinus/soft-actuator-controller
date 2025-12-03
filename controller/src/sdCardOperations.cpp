@@ -77,7 +77,8 @@ bool createFile(const char* fileName) {
     dataFile.print(F("KP,")); dataFile.println(KP, 5);
     dataFile.print(F("KI,")); dataFile.println(KI, 5);
     dataFile.print(F("KD,")); dataFile.println(KD, 5);
-    dataFile.print(F("Traj Follow Error Threshold,")); dataFile.println(THRESHOLD);
+    dataFile.print(F("Traj Follow Error Pressure Threshold,")); dataFile.println(TRAJ_FAIL_PRESSURE);
+    dataFile.print(F("Traj Follow Error Time Threshold,")); dataFile.println(TRAJ_FAIL_TIME);
     dataFile.print(F("Filter alpha,")); dataFile.println(FILTER_ALPHA, 5);
     dataFile.print(F("Sensor offset,")); dataFile.println(SENSOR_OFFSET, 5);
     dataFile.print(F("Pressure Read Delay,")); dataFile.println(PRESSURE_READ_DELAY);

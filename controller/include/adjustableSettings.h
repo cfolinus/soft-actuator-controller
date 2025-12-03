@@ -34,7 +34,8 @@ extern const int INTERP_CALC_DELAY;
 extern const int CONTROLLER_DELAY; 
 
 // PID Controller variables
-extern const double THRESHOLD;
+extern const double TRAJ_FAIL_PRESSURE;
+extern const double TRAJ_FAIL_TIME;
 extern const int OUTPUT_MIN;
 extern const int OUTPUT_MAX;
 extern const double KP;

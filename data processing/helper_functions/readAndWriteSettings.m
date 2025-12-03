@@ -28,8 +28,12 @@ function [csvFileName, kpValue, kiValue, kdValue, useKPA] = readAndWriteSettings
             settings.KI = str2double(extractAfter(dataLine, ','));
         elseif contains(dataLine, 'KD,')
             settings.KD = str2double(extractAfter(dataLine, ','));
-        elseif contains(dataLine, 'Traj Follow Error Threshold,')
-            settings.THRESHOLD = str2double(extractAfter(dataLine, ','));
+        elseif contains(dataLine, 'Traj Follow Error Pressure Threshold,')
+            settings.TRAJ_FAIL_PRESSURE = str2double(extractAfter(dataLine, ','));
+        elseif contains(dataLine, 'Traj Follow Error Time Threshold,')
+            settings.TRAJ_FAIL_TIME = str2double(extractAfter(dataLine, ','));
+        % elseif contains(dataLine, 'Traj Follow Error Threshold,')
+            % settings.THRESHOLD = str2double(extractAfter(dataLine, ','));
         elseif contains(dataLine, 'Filter alpha,')
             settings.FILTER_ALPHA = str2double(extractAfter(dataLine, ','));
         elseif contains(dataLine, 'Sensor offset,')
@@ -70,7 +74,9 @@ function [csvFileName, kpValue, kiValue, kdValue, useKPA] = readAndWriteSettings
     writecell({'KP', settings.KP, ''}, csvFileName, 'WriteMode', 'append');
     writecell({'KI', settings.KI, ''}, csvFileName, 'WriteMode', 'append');
     writecell({'KD', settings.KD, ''}, csvFileName, 'WriteMode', 'append');
-    writecell({'Traj Follow Error Threshold', settings.THRESHOLD, ''}, csvFileName, 'WriteMode', 'append');
+    % writecell({'Traj Follow Error Threshold', settings.THRESHOLD, ''}, csvFileName, 'WriteMode', 'append');
+    writecell({'Traj Follow Error Pressure Threshold', settings.TRAJ_FAIL_PRESSURE, ''}, csvFileName, 'WriteMode', 'append');
+    writecell({'Traj Follow Error Time Threshold', settings.TRAJ_FAIL_TIME, ''}, csvFileName, 'WriteMode', 'append');
     writecell({'Filter alpha', settings.FILTER_ALPHA, ''}, csvFileName, 'WriteMode', 'append');
     writecell({'Sensor offset', settings.SENSOR_OFFSET, ''}, csvFileName, 'WriteMode', 'append');
     writecell({'Pressure Read Delay', settings.PRESSURE_READ_DELAY, ''}, csvFileName, 'WriteMode', 'append');

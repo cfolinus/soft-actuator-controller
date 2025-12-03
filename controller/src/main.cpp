@@ -153,7 +153,8 @@ delay(20); // 20 millisecond delay between signal and mechanical valve response
       Serial.print(F("KP,")); Serial.println(KP, 5);
       Serial.print(F("KI,")); Serial.println(KI, 5);
       Serial.print(F("KD,")); Serial.println(KD, 5);
-      Serial.print(F("Traj Follow Error Threshold,")); Serial.println(THRESHOLD);
+      Serial.print(F("Traj Follow Error Pressure Threshold,")); Serial.println(TRAJ_FAIL_PRESSURE);
+      Serial.print(F("Traj Follow Error Time Threshold,")); Serial.println(TRAJ_FAIL_TIME);
       Serial.print(F("Filter alpha,")); Serial.println(FILTER_ALPHA, 5);
       Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5); 
       Serial.print(F("Pressure Read Delay,")); Serial.println(PRESSURE_READ_DELAY);
@@ -232,7 +233,10 @@ void loop() {
 
 
     // Check that controller isn't failing to follow the trajectory
-    if (traj.failingToFollow(SensorPressure, deltaT, THRESHOLD)) {
+    if (traj.failingToFollow(SensorPressure,
+                              deltaT, 
+                              TRAJ_FAIL_PRESSURE, 
+                              TRAJ_FAIL_TIME)) {
       endTest(F("Traj Follow Fail"), totalCycles);
     }
 

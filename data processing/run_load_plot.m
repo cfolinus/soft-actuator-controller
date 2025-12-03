@@ -2,10 +2,7 @@ clear; close all;
 addpath(genpath('helper_functions'));
 
 % csv_filepath = fullfile('data', 'cycles', '251023_cycle_0.csv');
-csv_filepath = fullfile('data', 'cycles', ...
-                        'Green', ...
-                        'cycle_specimen46_trial1.csv');
-
+csv_filepath = fullfile('data', 'tuning_test_1.csv');
 units.psi_to_kPa = 6.89476;
 units.kPa_to_psi = 1 / 6.89476;
 

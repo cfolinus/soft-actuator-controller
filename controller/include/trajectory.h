@@ -26,13 +26,18 @@ public:
     bool isFinished(unsigned long deltaT) const;
 
     // Set new trajectory points and precompute differences
-    bool setTrajectoryPoints(const float* newTimes, const double* newPressures, int size);
+    bool setTrajectoryPoints(const float* newTimes,
+                            const double* newPressures,
+                            int size);
 
     // Linear interpolation based on deltaT
     float interp(unsigned long deltaT);
 
     // Check if system is failing to follow trajectory
-    bool failingToFollow(double actualPressure, float deltaT, double threshold);
+    bool failingToFollow(double actualPressure, 
+                            float deltaT, 
+                            double threshold,
+                            double timeoutDuration);
 
 private:
     // Helper to update the timeout duration based on the longest time interval
