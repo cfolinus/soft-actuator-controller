@@ -1,0 +1,15 @@
+Settings:,,
+Use KPA,0,
+KP,0.72,
+KI,3.38,
+KD,0,
+Traj Follow Error Pressure Threshold,4.35,
+Traj Follow Error Time Threshold,1500,
+Filter alpha,0,
+Sensor offset,-0.232,
+Pressure Read Delay,30,
+Interpolation Calculation Delay,30,
+Controller Delay,30,
+"Traj times","0.00, 100.00, 1500.00, 1600.00, 3000.00, ",""
+"Traj pressures","0.00, 8.70, 8.70, 0.00, 0.00, ",""
+time,pressure,error,integral,cycle_start

@@ -44,9 +44,11 @@ void endTest(String reason, int cycles){
 void setup() {
   // Initialize Serial w/ Baud Rate 115200
   Serial.begin(115200);
+
   // Initialize LCD
   lcd.init();
   lcd.backlight();
+
   // Initialize valves and pressure sensor
   pinMode(PRESSURE_PIN, OUTPUT);
   pinMode(VENT_PIN, OUTPUT);
@@ -56,23 +58,11 @@ void setup() {
   pinMode(STOP_BUTTON_PIN, INPUT_PULLUP);
 
   // vent any air in the system
-openVentValve();
-delay(1000);
+  openVentValve();
+  delay(1000);
 
-closeValves();
-delay(20); // 20 millisecond delay between signal and mechanical valve response
-
-  // openVentValve();
-
-  // openPressureValve();
-  // delay(1000);
-  // closeValves();
-  // delay(1000);
-
-  // openVentValve();
-  // delay(1000);
-  // closeValves();
-
+  closeValves();
+  delay(20); // 20 millisecond delay between signal and mechanical valve response
 
   // // TODO TROUBLESHOOT VENTING
   setLCD("Initializing...", "");
@@ -82,6 +72,34 @@ delay(20); // 20 millisecond delay between signal and mechanical valve response
   // closePressureValve();
   // setLCD(F("Venting..."), F("Please wait"));
   // Serial.println("NEW RUN");
+  // Serial.println("INFLATE");
+  // openPressureValve();
+  // for (int t = 0; t < 1000; t += 20) {
+  //   UpdateFilteredSensorPressure(USE_KPA);
+  //   Serial.println(SensorPressure);
+  //   delay(20);
+  // }
+
+  // // Serial.println("HOLD");
+  // // closePressureValve();
+  // // for (int t = 0; t < 1000; t += 20) {
+  // //   UpdateFilteredSensorPressure(USE_KPA);
+  // //   Serial.println(SensorPressure);
+  // //   delay(20);
+  // // }  
+  // closePressureValve();
+
+  // Serial.println("DEFLATE");
+  // ventProportional(1.0);
+  // for (int t = 0; t < 1000; t += 20) {
+  //   UpdateFilteredSensorPressure(USE_KPA);
+  //   Serial.println(SensorPressure);
+  //   delay(20);
+  // }  
+
+  // closeValves();
+  // delay(50);
+
 
   // Serial.println("Venting");
   // Serial.println(analogRead(SENSOR_PIN));
@@ -150,25 +168,58 @@ delay(20); // 20 millisecond delay between signal and mechanical valve response
     }
     else{
       Serial.println(F("Settings:"));
-      Serial.print(F("filename,")); Serial.println(fileName);
-      Serial.print(F("Use KPA?,")); Serial.println(USE_KPA);
-      Serial.print(F("KP,")); Serial.println(KP, 5);
-      Serial.print(F("KI,")); Serial.println(KI, 5);
-      Serial.print(F("KD,")); Serial.println(KD, 5);
-      Serial.print(F("Traj Follow Error Pressure Threshold,")); Serial.println(TRAJ_FAIL_PRESSURE);
-      Serial.print(F("Traj Follow Error Time Threshold,")); Serial.println(TRAJ_FAIL_TIME);
-      Serial.print(F("Filter alpha,")); Serial.println(FILTER_ALPHA, 5);
-      Serial.print(F("Sensor offset,")); Serial.println(SENSOR_OFFSET, 5); 
-      Serial.print(F("Pressure Read Delay,")); Serial.println(PRESSURE_READ_DELAY);
-      Serial.print(F("Interpolation Calculation Delay,")); Serial.println(INTERP_CALC_DELAY);
-      Serial.print(F("Controller Delay,")); Serial.println(CONTROLLER_DELAY);
+      Serial.print(F("filename,"));
+      Serial.println(fileName);
+
+      Serial.print(F("Use KPA?,"));
+      Serial.println(USE_KPA);
+
+      Serial.print(F("KP,"));
+      Serial.println(KP, 5);
+
+      Serial.print(F("KI,"));
+      Serial.println(KI, 5);
+
+      Serial.print(F("KD,"));
+      Serial.println(KD, 5);
+
+      Serial.print(F("Traj Follow Error Pressure Threshold,"));
+      Serial.println(TRAJ_FAIL_PRESSURE);
+
+      Serial.print(F("Traj Follow Error Time Threshold,"));
+      Serial.println(TRAJ_FAIL_TIME);
+
+      Serial.print(F("Filter alpha,"));
+      Serial.println(FILTER_ALPHA, 5);
+
+      Serial.print(F("Sensor offset,"));
+      Serial.println(SENSOR_OFFSET, 5); 
+
+      Serial.print(F("Pressure Read Delay,"));
+      Serial.println(PRESSURE_READ_DELAY);
+
+      Serial.print(F("Interpolation Calculation Delay,")); 
+      Serial.println(INTERP_CALC_DELAY);
+
+      Serial.print(F("Controller Delay,"));
+      Serial.println(CONTROLLER_DELAY);
+
       Serial.print(F("Traj times,"));
-      for (int i = 0; i < TRAJ_SIZE; i++) Serial.print(TIMES[i]), Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+      for (int i = 0; i < TRAJ_SIZE; i++) {
+              Serial.print(TIMES[i]); 
+              Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+            };
+
       Serial.print(F("Traj pressures,"));
-      for (int i = 0; i < TRAJ_SIZE; i++) Serial.print(PRESSURES[i]), Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+      for (int i = 0; i < TRAJ_SIZE; i++) {
+            Serial.print(PRESSURES[i]);
+            Serial.print(i < TRAJ_SIZE - 1 ? ',' : '\n');
+        };
+
       Serial.println(F("Data:"));
       Serial.println(F("UPDATED TEXT"));
     }
+    
     // Initialize trajectory
     if(!InitializeTrajectory(&traj, TIMES, PRESSURES, TRAJ_SIZE)){
       setLCD(F("Traj Error"), F("Check Serial"));

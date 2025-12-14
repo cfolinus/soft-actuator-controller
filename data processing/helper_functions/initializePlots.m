@@ -12,19 +12,19 @@ function [pressurePlot, controlSignalPlot, errorPlot, integralPlot, kpErrorPlot,
 
     % Create subplots and return their handles
     ax1 = nexttile; hold(ax1, 'on');
-    pressurePlot = plot(ax1, NaN, NaN, '-o', 'LineWidth', 2, 'DisplayName', 'Measured Pressure');
+    pressurePlot = plot(ax1, NaN, NaN, '-o', 'LineWidth', 1, 'DisplayName', 'Measured Pressure');
     ylabel(ax1, ['Pressure (' pressureUnit ')'], 'FontSize', 16);
     grid(ax1, 'on'); legend(ax1, 'show', 'Location', 'best');
 
-    ax2 = nexttile; controlSignalPlot = plot(ax2, NaN, NaN, 'r-', 'LineWidth', 2, 'DisplayName', 'Control Signal');
+    ax2 = nexttile; controlSignalPlot = plot(ax2, NaN, NaN, 'r-', 'LineWidth', 1, 'DisplayName', 'Control Signal');
     ylabel(ax2, 'Control Signal', 'FontSize', 16);
     grid(ax2, 'on'); legend(ax2, 'show', 'Location', 'best');
 
-    ax3 = nexttile; errorPlot = plot(ax3, NaN, NaN, 'b-', 'LineWidth', 2, 'DisplayName', 'Error');
+    ax3 = nexttile; errorPlot = plot(ax3, NaN, NaN, 'b-', 'LineWidth', 1, 'DisplayName', 'Error');
     ylabel(ax3, 'Error', 'FontSize', 16);
     grid(ax3, 'on'); legend(ax3, 'show', 'Location', 'best');
 
-    ax4 = nexttile; integralPlot = plot(ax4, NaN, NaN, 'g-', 'LineWidth', 2, 'DisplayName', 'Integral Error');
+    ax4 = nexttile; integralPlot = plot(ax4, NaN, NaN, 'g-', 'LineWidth', 1, 'DisplayName', 'Integral Error');
     ylabel(ax4, 'Integral Error', 'FontSize', 16);
     grid(ax4, 'on'); legend(ax4, 'show', 'Location', 'best');
 

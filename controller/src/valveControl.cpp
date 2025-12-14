@@ -53,17 +53,29 @@ void vent(){
 
 // analog write to both valves
 void pressurizeProportional(float controlSignal){
+
+  // Fully close vent valve
   writeVentValve(0);
+
+  // Transform controlSignal (0-100% valve open) to PWM value
   float temp = mapFloat(controlSignal, 0.0, 1.0, 0.0, ANALOG_PRESSURE_RANGE);
   int setpoint = constrain(temp+ANALOG_PRESSURE_MIN, 0, ANALOG_PRESSURE_MAX);
+
+  // Partially open pressure valve
   writePressureValve(setpoint);
   
 }
 
 void ventProportional(float controlSignal){
+
+  // Fully close pressure valve
   writePressureValve(0);
+
+  // Transform controlSignal (0-100% valve open) to PWM value
   float temp = mapFloat(controlSignal, 0.0, 1.0, 0.0, ANALOG_VENT_RANGE);
   int setpoint = constrain(temp+ANALOG_VENT_MIN, 0, ANALOG_VENT_MAX);
+
+  // Partially open vent valve
   writeVentValve(setpoint);
 }
 

@@ -11,13 +11,42 @@ end
 
 % Assumes time in column 1, pressure in column 2, error in column 3,
 % and integral error in column 4
-time = data(2:end, 1)/1000; % Convert to seconds for readability
+time = data(2:end, 1); % Convert to seconds for readability
 pressure = data(2:end, 2);
 error = data(2:end, 3);
 integral_error = data(2:end, 4); 
 
 % Compute the control signal using PID formula with provided integral error
 control_signal = Kp * error + Ki * integral_error;
+
+% Compute the valve signal
+function x_out = mapFloat (x, in_min, in_max, out_min, out_max)
+    x_out = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+end
+
+ANALOG_PRESSURE_MIN = 145;
+ANALOG_PRESSURE_MAX = 173;
+ANALOG_VENT_MIN = 143;
+ANALOG_VENT_MAX = 175;
+
+pressure_valve_signal = (control_signal > 1) ...
+    .* mapFloat(control_signal, 0, 1, 0, ANALOG_PRESSURE_MAX - ANALOG_PRESSURE_MIN) ...
+    + ANALOG_PRESSURE_MIN;
+vent_valve_signal = (control_signal < 1) ...
+    .* mapFloat(abs(control_signal), 0, 1, 0, ANALOG_VENT_MAX - ANALOG_VENT_MIN) ...
+    + ANALOG_VENT_MIN;
+
+pressure_valve_signal = min (pressure_valve_signal, ANALOG_PRESSURE_MAX);
+vent_valve_signal = min (vent_valve_signal, ANALOG_VENT_MAX);
+
+figure; hold on;
+plot (time, pressure_valve_signal);
+plot (time, vent_valve_signal);
+
+yline (ANALOG_PRESSURE_MIN, '--', 'Alpha', 1, 'Color', 0 * [1,1,1]);
+yline (ANALOG_PRESSURE_MAX, '--', 'Alpha', 1, 'Color', 0 * [1,1,1]);
+yline (ANALOG_VENT_MIN, '--', 'Alpha', 1, 'Color', 0.5 * [1,1,1]);
+yline (ANALOG_VENT_MAX, '--', 'Alpha', 1, 'Color', 0.5 * [1,1,1]);
 
 % Replace underscores in the file name for plot title
 plotTitle = strrep(fileName, '_', ' ');
@@ -93,4 +122,4 @@ lgd = legend(legendEntries, legendLabels, ...
 lgd.Layout.Tile = 'south';
 
 % Improve plot appearance
-improvePlot();
+improveHangerFig(4*150, 2* 3*150);

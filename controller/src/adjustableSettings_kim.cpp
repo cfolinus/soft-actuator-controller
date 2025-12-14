@@ -16,16 +16,16 @@ const int VENT_PIN = 5;
 /* Control the pressure applied by the pneumatic valves.
    Adjust the min and max analog PWM write values to calibrate the pressure range. */
 const int ANALOG_PRESSURE_MIN = 151;
-const int ANALOG_PRESSURE_MAX = 183;
+const int ANALOG_PRESSURE_MAX = 185;
 const int ANALOG_VENT_MIN = 145;
-const int ANALOG_VENT_MAX = 158;
+const int ANALOG_VENT_MAX = 165;
 
 // ========== Filename Settings ==========
 /* String for name of file series. Controller will automatically generate csv
    file with lowest available integer appended to the end, so as to not overwrite 
    existing data files on the SD card */
 
-const char fileName[] = "kim_debug";
+const char fileName[] = "kim_pid";
 
 // ========== Tuning Modes ==========
 /* Toggles for the initial tuning processes for the pressure and vent solenoid valves,
@@ -44,7 +44,7 @@ const bool TUNE_VENT = false;
 const bool USE_SD_CARD = false;
 const bool USE_KPA = false; 
 const double FILTER_ALPHA = 0.0;
-const int OVERPRESSURE_LIMIT = 17.4; // units depend on value of USE_KPA
+const int OVERPRESSURE_LIMIT = 22.5; // units depend on value of USE_KPA
 const double SENSOR_OFFSET = -0.05; // Offset used to calibrate a specific sensor
 
 // ========== Frequency Settings ==========
@@ -65,8 +65,8 @@ const double TRAJ_FAIL_PRESSURE = 4.35;
 const double TRAJ_FAIL_TIME = 1500; // timeout duration in milliseconds
 const int OUTPUT_MIN = -1.0; // DO NOT CHANGE
 const int OUTPUT_MAX = 1.0; // DO NOT CHANGE
-const double KP = 0.72;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
-const double KI = 3.38;
+const double KP = 0.5;	  // Start with Kp = 0.1, Ki = 0.0, Kd = 0.0 for Zeigler-Nichols tuning
+const double KI = 0;
 const double KD = 0.0;
 
 // ========== Trajectory Settings ==========
@@ -85,8 +85,8 @@ const double KD = 0.0;
 */
 
 // Step Function Trajectory
-const float TIMES[] = {0, 100, 1500, 1600, 3000}; // milliseconds
-const double PRESSURES[] = {0, 8.7, 8.7, 0, 0};   // PSI or Kpa
+const float TIMES[] = {0, 1000, 1100, 8500, 8600, 16000}; // milliseconds
+const double PRESSURES[] = {0, 0, 17.5, 17.5, 0, 0};   // PSI or Kpa
 
 
 // const float TIMES[] = {0, 100, 2000, 2100, 4000}; // milliseconds

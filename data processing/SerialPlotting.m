@@ -1,12 +1,13 @@
 % Initialize serial communication and clear workspace
-close all; clear; clc;
+close all hidden; clear; clc;
 
 % Adjust if necessary
 addpath(genpath('helper_functions'));
 
 % Initialize Serial Communication
 % Change to match the serial port on your comptuer
-s = initializeSerial("/dev/tty.usbserial-A10LT2ZA", 115200);
+% s = initializeSerial("/dev/tty.usbserial-A10LT2ZA", 115200);
+s = initializeSerial("/dev/tty.usbserial-A10LS889", 115200);
 
 % Call the function to read settings, create the CSV file, and get PID values
 [csvFileName, kpValue, kiValue, kdValue, useKPa] = readAndWriteSettings(s);
