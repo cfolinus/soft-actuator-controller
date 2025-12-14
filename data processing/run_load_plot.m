@@ -3,7 +3,7 @@ addpath(genpath('helper_functions'));
 
 % csv_filepath = fullfile('data', 'cycles', '251023_cycle_0.csv');
 % csv_filepath = fullfile('data', 'tuning_test_1.csv');
-csv_filepath = 'ron_pid_MATLAB_33.csv';
+csv_filepath = 'kim_cycle_2.csv';
 units.psi_to_kPa = 6.89476;
 units.kPa_to_psi = 1 / 6.89476;
 
@@ -169,7 +169,7 @@ end
 
 
 %% Manually check for end conditions
-pressure_threshold_kPa = 0.5 * max(controller_params.trajectory_pressure_kPa);
+pressure_threshold_kPa = 0.75 * max(controller_params.trajectory_pressure_kPa);
 
 
 max_cycle_pressure_kPa = nan([num_raw_cycles, 1]);
